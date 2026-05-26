@@ -3,16 +3,20 @@ import path from "path";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
-import { CLINICAL_CASES } from "./src/types.js"; // note: node module loading might require standard file resolution or simple import/fallback
+import { CLINICAL_CASES } from "./src/types.js";
 
 dotenv.config();
+
+// Standardize Logging
+const log = (msg: string) => console.log(`[LifeSync OS] ${msg}`);
+const error = (msg: string, err?: any) => console.error(`[LifeSync OS ERROR] ${msg}`, err || '');
 
 export const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = 3000; // Hardcoded per platform requirements
 
-// Lazy initialization of Gemini client to prevent crashes if key is empty
+// Lazy initialization of Gemini client
 let aiClient: GoogleGenAI | null = null;
 function getGemini(): GoogleGenAI | null {
   if (!aiClient) {
@@ -27,9 +31,12 @@ function getGemini(): GoogleGenAI | null {
             }
           }
         });
+        log("Gemini Client initialized successfully");
       } catch (err) {
-        console.error("Failed to initialize Gemini Client: ", err);
+        error("Failed to initialize Gemini Client", err);
       }
+    } else {
+      log("GEMINI_API_KEY not found or default. Using local clinical fallback engine.");
     }
   }
   return aiClient;
@@ -208,14 +215,17 @@ app.post("/api/chat", async (req, res) => {
       const responseText = response.text?.trim() || "";
       if (responseText) {
         try {
-          const parsed = JSON.parse(responseText);
+          // Robust JSON extraction in case model adds markdown backticks
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+          const jsonString = jsonMatch ? jsonMatch[0] : responseText;
+          const parsed = JSON.parse(jsonString);
           return res.json(parsed);
         } catch (parseErr) {
-          console.warn("JSON parsing of gemini output failed, falling back", responseText);
+          error("JSON parsing of gemini output failed, falling back", responseText);
         }
       }
-    } catch (apiError) {
-      console.error("Gemini API call error: ", apiError);
+    } catch (apiError: any) {
+      error("Gemini API call failed", apiError.message);
     }
   }
 
@@ -326,24 +336,27 @@ app.get("/api/fhir/stats", (req, res) => {
 // ----------------- VITE ENDPOINT WRAPPERS -----------------
 
 async function startServer() {
-  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  const isVercel = process.env.VERCEL === "1" || !!process.env.VERCEL;
+  
+  if (process.env.NODE_ENV !== "production" && !isVercel) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else if (!process.env.VERCEL) {
+    log("Vite middleware mounted (Development)");
+  } else if (!isVercel) {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+    log(`Serving static files from ${distPath} (Production)`);
   }
 
-  // Only listen when not in Vercel serverless environment
-  if (!process.env.VERCEL) {
+  if (!isVercel) {
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`[LifeSync OS Core] Running securely on port ${PORT}`);
+      log(`Running securely on port ${PORT}`);
     });
   }
 }
