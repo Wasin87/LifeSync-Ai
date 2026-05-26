@@ -58,11 +58,6 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
           language: lang
         })
       });
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
-      
       const data = await response.json();
 
       const aiMsg: Message = {
@@ -70,24 +65,22 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
         sender: 'ai',
         text: data.text,
         timestamp: new Date().toLocaleTimeString(),
-        medicalDetails: data.risk ? {
-          confidence: data.confidence || 0,
-          risk: data.risk || 'YELLOW',
-          citations: data.citations || [],
-          reasoning: data.reasoning || '',
-          treatment: data.treatment || ''
-        } : undefined
+        medicalDetails: {
+          confidence: data.confidence,
+          risk: data.risk,
+          citations: data.citations,
+          reasoning: data.reasoning,
+          treatment: data.treatment
+        }
       };
       setMessages(prev => [...prev, aiMsg]);
     } catch (err) {
-      console.error("Chat Error:", err);
-      // More professional fallback message
+      console.error(err);
+      // Fallback
       setMessages(prev => [...prev, {
         id: `ai-err-${Date.now()}`,
         sender: 'ai',
-        text: lang === 'en' 
-          ? "I'm currently having trouble connecting to the clinical engine. Please ensure your internet connection is stable or try again shortly."
-          : "ক্লিনিকাল ইঞ্জিনের সাথে সংযোগ স্থাপন করতে সমস্যা হচ্ছে। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং পুনরায় চেষ্টা করুন।",
+        text: "System momentarily offline. Running local core dictionary simulation.",
         timestamp: new Date().toLocaleTimeString()
       }]);
     } finally {
@@ -331,7 +324,7 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
         )}
 
         {/* Input area */}
-        <div className="p-3 lg:p-4 border-t border-slate-200 dark:border-slate-800/80 bg-slate-500/5 flex items-center gap-1.5 lg:gap-2">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800/80 bg-slate-500/5 flex items-center gap-2">
           {activeUpload && (
             <div className="p-2 rounded bg-purple-500/10 text-purple-500 flex items-center gap-1 text-[11px] absolute translate-y-[-55px] font-mono border border-purple-500/20 shadow">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -342,14 +335,14 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
           <button
             id="mic-record-btn"
             onClick={handleMicToggle}
-            className={`p-2 lg:p-2.5 rounded-xl border transition-all shrink-0 ${
+            className={`p-2.5 rounded-xl border transition-all ${
               isRecording 
                 ? 'bg-red-500 text-white border-red-400' 
                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-purple-500 hover:border-purple-500/30'
             }`}
             title="Scribe clinical speech dictation"
           >
-            {isRecording ? <MicOff className="w-4.5 h-4.5 lg:w-5 lg:h-5 animate-pulse" /> : <Mic className="w-4.5 h-4.5 lg:w-5 lg:h-5" />}
+            {isRecording ? <MicOff className="w-5 h-5 animate-pulse" /> : <Mic className="w-5 h-5" />}
           </button>
 
           <input
@@ -358,16 +351,16 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
-            placeholder={lang === 'en' ? "Describe indicators..." : "লক্ষণসমূহ উল্লেখ করুন..."}
-            className="flex-1 p-2 lg:p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs lg:text-sm text-slate-800 dark:text-slate-100 min-w-0"
+            placeholder={lang === 'en' ? "Describe clinical indicators..." : "লক্ষণসমূহ উল্লেখ করুন..."}
+            className="flex-1 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm text-slate-800 dark:text-slate-100"
           />
 
           <button
             id="send-chat-btn"
             onClick={() => sendMessage(input)}
-            className="p-2 lg:p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-all flex items-center justify-center shadow shrink-0 mr-1 lg:mr-0"
+            className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-all flex items-center justify-center shadow"
           >
-            <Send className="w-4.5 h-4.5 lg:w-5 lg:h-5" />
+            <Send className="w-5 h-5" />
           </button>
         </div>
 

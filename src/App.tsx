@@ -6,8 +6,6 @@ import {
   Menu, X, Moon, Sun, TrendingUp, HelpCircle, FileText
 } from 'lucide-react';
 import { Language, Theme, getTranslation } from './types.js';
-import { Logo } from './components/Logo.js';
-import { InstallPWA } from './components/InstallPWA.js';
 
 // Import All Views
 import HomeView from './components/HomeView.js';
@@ -98,8 +96,6 @@ export default function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative overflow-x-hidden cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
       
-      <InstallPWA />
-
       {/* Decorative ambient glowing beams inspired by the Proxima and Cawar mockups */}
       <div className="absolute top-0 left-0 w-full h-[600px] pointer-events-none overflow-hidden select-none z-0">
         <div className="absolute -top-[150px] left-[15%] w-[130%] h-[400px] bg-gradient-to-r from-purple-500/0 via-purple-500/15 to-purple-500/0 rotate-[-12deg] blur-3xl beam-sweep pointer-events-none"></div>
@@ -113,8 +109,8 @@ export default function App() {
         {/* Logo and Brand Identity */}
         <div className="space-y-1 select-none pb-4 border-b border-slate-100 dark:border-purple-950/40">
           <div className="flex items-center gap-2.5">
-            <span className="p-1.5 rounded-2xl bg-[#0f0e17] border border-indigo-500/20 shadow-lg shadow-indigo-900/40 flex items-center justify-center overflow-hidden">
-              <Logo className="w-8 h-8 scale-110 drop-shadow-md" isDark={true} />
+            <span className="p-2.5 rounded-xl bg-purple-600 text-white shadow shadow-purple-500/35">
+              <Activity className="w-5.5 h-5.5 animate-pulse" />
             </span>
             <div>
               <h1 className="font-extrabold tracking-tight text-md text-slate-900 dark:text-white font-sans flex items-center gap-1.5 leading-none">
@@ -269,8 +265,8 @@ export default function App() {
 
                 <div className="relative z-10 flex justify-between items-center pb-5 border-b border-slate-150 dark:border-purple-950/40">
                   <div className="flex items-center gap-2.5">
-                    <span className="p-1.5 rounded-2xl bg-[#0f0e17] border border-indigo-500/20 shadow-lg shadow-indigo-900/40 flex items-center justify-center overflow-hidden">
-                      <Logo className="w-8 h-8 scale-110 drop-shadow-md" isDark={true} />
+                    <span className="p-2 rounded-xl bg-purple-600 text-white shadow shadow-purple-500/35">
+                      <Activity className="w-4.5 h-4.5 animate-pulse" />
                     </span>
                     <div>
                       <span className="font-extrabold tracking-tight text-slate-950 dark:text-white text-sm font-sans">{t.brandName}</span>

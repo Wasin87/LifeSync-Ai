@@ -1,11 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { 
-  Heart, ShieldAlert, WifiOff, Users, Database, 
+  Activity, Heart, ShieldAlert, WifiOff, Users, Database, 
   ChevronRight, Brain, Sparkles, TrendingUp, Compass, Award, ShieldCheck, Cpu
 } from 'lucide-react';
 import { getTranslation, Language } from '../types.js';
-import { Logo } from './Logo.js';
 
 interface HomeViewProps {
   lang: Language;
@@ -122,7 +121,7 @@ export default function HomeView({ lang, onNavigate, online }: HomeViewProps) {
         className="relative p-6 md:p-12 rounded-3xl overflow-hidden glass-card-light dark:glass-card-dark border border-purple-500/25 dark:border-purple-500/30 flex flex-col justify-between gap-6 glow-purple"
       >
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none select-none">
-          <Logo className="w-64 h-64 opacity-50" />
+          <Activity className="w-64 h-64 text-purple-600 dark:text-purple-400" />
         </div>
         
         {/* Glow Spheres */}
@@ -159,11 +158,9 @@ export default function HomeView({ lang, onNavigate, online }: HomeViewProps) {
             <button 
               id="hero-chat-btn"
               onClick={() => onNavigate('chat')} 
-              className="px-6 py-3 rounded-xl font-bold bg-white/80 dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-purple-500/20 transition-all flex items-center gap-3 hover:scale-[1.02] active:scale-95 cursor-pointer select-none"
+              className="px-6 py-3 rounded-xl font-bold bg-white/80 dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-purple-500/20 transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer select-none"
             >
-              <span className="p-1 rounded-lg bg-[#0f0e17] border border-indigo-500/20 shadow flex items-center justify-center">
-                <Logo className="w-4 h-4 scale-110" isDark={true} />
-              </span>
+              <Activity className="w-4.5 h-4.5 text-purple-500" />
               {lang === 'en' ? "Open AI Consult" : "এআই কনসাল্ট শুরু করুন"}
               <ChevronRight className="w-4 h-4 text-purple-500" />
             </button>

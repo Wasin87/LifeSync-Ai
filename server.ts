@@ -3,20 +3,16 @@ import path from "path";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
-import { CLINICAL_CASES } from "./src/types.js";
+import { CLINICAL_CASES } from "./src/types.js"; // note: node module loading might require standard file resolution or simple import/fallback
 
 dotenv.config();
 
-// Standardize Logging
-const log = (msg: string) => console.log(`[LifeSync OS] ${msg}`);
-const error = (msg: string, err?: any) => console.error(`[LifeSync OS ERROR] ${msg}`, err || '');
-
-export const app = express();
+const app = express();
 app.use(express.json());
 
-const PORT = 3000; // Hardcoded per platform requirements
+const PORT = 3000;
 
-// Lazy initialization of Gemini client
+// Lazy initialization of Gemini client to prevent crashes if key is empty
 let aiClient: GoogleGenAI | null = null;
 function getGemini(): GoogleGenAI | null {
   if (!aiClient) {
@@ -31,12 +27,9 @@ function getGemini(): GoogleGenAI | null {
             }
           }
         });
-        log("Gemini Client initialized successfully");
       } catch (err) {
-        error("Failed to initialize Gemini Client", err);
+        console.error("Failed to initialize Gemini Client: ", err);
       }
-    } else {
-      log("GEMINI_API_KEY not found or default. Using local clinical fallback engine.");
     }
   }
   return aiClient;
@@ -215,17 +208,14 @@ app.post("/api/chat", async (req, res) => {
       const responseText = response.text?.trim() || "";
       if (responseText) {
         try {
-          // Robust JSON extraction in case model adds markdown backticks
-          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-          const jsonString = jsonMatch ? jsonMatch[0] : responseText;
-          const parsed = JSON.parse(jsonString);
+          const parsed = JSON.parse(responseText);
           return res.json(parsed);
         } catch (parseErr) {
-          error("JSON parsing of gemini output failed, falling back", responseText);
+          console.warn("JSON parsing of gemini output failed, falling back", responseText);
         }
       }
-    } catch (apiError: any) {
-      error("Gemini API call failed", apiError.message);
+    } catch (apiError) {
+      console.error("Gemini API call error: ", apiError);
     }
   }
 
@@ -336,30 +326,23 @@ app.get("/api/fhir/stats", (req, res) => {
 // ----------------- VITE ENDPOINT WRAPPERS -----------------
 
 async function startServer() {
-  const isVercel = process.env.VERCEL === "1" || !!process.env.VERCEL;
-  
-  if (process.env.NODE_ENV !== "production" && !isVercel) {
+  if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-    log("Vite middleware mounted (Development)");
-  } else if (!isVercel) {
+  } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
-    log(`Serving static files from ${distPath} (Production)`);
   }
 
-  if (!isVercel) {
-    app.listen(PORT, "0.0.0.0", () => {
-      log(`Running securely on port ${PORT}`);
-    });
-  }
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`[LifeSync OS Core] Running securely on port ${PORT}`);
+  });
 }
 
 startServer();
-export default app;
