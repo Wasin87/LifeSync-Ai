@@ -1,0 +1,25 @@
+{
+  "short_name": "LifeSync AI",
+  "name": "LifeSync AI: Smart Healthcare Companion",
+  "description": "Smart personalized life, medical, maternal, and telehealth management companion powered by advanced AI and resilient offline-sync capabilities.",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/parakeet/512/experimental-treatment-plan-parakeet.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://img.icons8.com/parakeet/192/experimental-treatment-plan-parakeet.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0c061d",
+  "theme_color": "#8b5cf6",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["medical", "health", "productivity"]
+}

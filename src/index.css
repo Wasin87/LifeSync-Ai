@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@variant dark (.dark &, &.dark);
+
+@theme {
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Additional customized variables for Glows & Purple Neon Care */
+  --color-medical-light-bg: #FAF9FF;
+  --color-medical-dark-bg: #03000A;
+  --color-medical-purple: #8B5CF6;
+  --color-medical-neon: #A78BFA;
+  --color-medical-cyan: #22D3EE;
+}
+
+/* Animations, scrollbars, and customized custom styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.4);
+}
+
+@utility glass-card-light {
+  background: #ffffff !important;
+  border: 1px solid rgba(139, 92, 246, 0.25) !important;
+  box-shadow: 
+    0 10px 25px -5px rgba(139, 92, 246, 0.18),
+    0 4px 12px -2px rgba(139, 92, 246, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility glass-card-dark {
+  background: #0c061d !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    0 12px 35px -5px rgba(168, 85, 247, 0.38),
+    0 4px 12px -2px rgba(168, 85, 247, 0.22) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
+}
+
+.dark .glass-card-light {
+  background: #0c061d !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    0 12px 35px -5px rgba(168, 85, 247, 0.38),
+    0 4px 12px -2px rgba(168, 85, 247, 0.22) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
+}
+
+/* Beautiful grids and overlays */
+.cosmic-grid {
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.dark .cosmic-grid {
+  background-image: 
+    linear-gradient(rgba(168, 85, 247, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.glow-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.glow-btn:hover::after {
+  opacity: 1;
+}
+
+/* Premium Neumorphic glow details as in custom screenshots */
+.neo-pill-purple {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.15);
+}
+.neo-pill-active {
+  background: #A855F7;
+  color: white;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+/* Pulse / radar animations */
+@keyframes auraPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.45;
+  }
+}
+.aura-glow {
+  animation: auraPulse 6s infinite ease-in-out;
+}
+
+@keyframes beamSweep {
+  0% {
+    transform: rotate(-15deg) translateY(-20px);
+    opacity: 0.7;
+  }
+  50% {
+    transform: rotate(-12deg) translateY(10px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(-15deg) translateY(-20px);
+    opacity: 0.7;
+  }
+}
+
+.beam-sweep {
+  animation: beamSweep 10s infinite ease-in-out;
+}
+
+/* Custom shadow utilities */
+.glow-purple {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+}
+.dark .glow-purple {
+  box-shadow: 0 0 45px rgba(168, 85, 247, 0.45);
+}
+
+/* 
+  Light Mode Contrast & Professional Purple Shadow Overrides 
+  Prevents card elements from mixing/blending with the light lavender page background gradient.
+*/
+.light,
+.light body,
+.light .min-h-screen {
+  background: linear-gradient(135deg, #FAF8FF 0%, #FAF8FF 50%, #F5EEFF 100%) !important;
+}
+
+.light .bg-white,
+.light .bg-white\/80,
+.light .bg-white\/70,
+.light .bg-white\/95,
+.light .glass-card-light,
+.light [class*="glass-card-light"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(139, 92, 246, 0.22) !important;
+  box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.16), 0 4px 10px -2px rgba(139, 92, 246, 0.08) !important;
+}
+
+/* 
+  Absolute Black Theme Overrides
+  Maintains pure black (#000000) for the main body/page background, 
+  while keeping cards highlighted in a premium dark-violet coal (#0c061d) 
+  so that they have high-fidelity contrast, stylish slate-gray borders, 
+  and professional purple neon shadows.
+*/
+.dark,
+.dark body,
+.dark .min-h-screen,
+.dark #main-view-router-compartment {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-slate-200,
+.dark .bg-slate-900,
+.dark .bg-slate-950,
+.dark .bg-slate-500\/5,
+.dark .dark\:bg-slate-900,
+.dark .dark\:bg-slate-800,
+.dark .dark\:bg-slate-950,
+.dark .dark\:bg-purple-950\/20,
+.dark .dark\:bg-purple-950\/30,
+.dark .dark\:bg-purple-950\/35,
+.dark .dark\:bg-purple-950\/40,
+.dark .dark\:bg-purple-950\/50,
+.dark .dark\:bg-\[\#110931\]\/40,
+.dark .dark\:bg-\[\#0f072c\]\/40,
+.dark [class*="glass-card-dark"],
+.dark [class*="dark:bg-slate-"],
+.dark [class*="dark:bg-[#110931]"],
+.dark [class*="dark:bg-[#0f072c]"],
+.dark [class*="dark:bg-purple-950"] {
+  background-color: #0c061d !important;
+  background: #0c061d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.35) !important;
+  box-shadow: 0 10px 30px -5px rgba(168, 85, 247, 0.35), 0 4px 12px -2px rgba(168, 85, 247, 0.2) !important;
+}
+
+/* Exclude active purple status pills or highlight buttons from forced override */
+.dark .bg-purple-600,
+.dark .bg-purple-600 * {
+  background-color: #8b5cf6 !important;
+  color: #ffffff !important;
+}
+
+/* Refined input and field elements */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Strict white text elevations for dark mode readability */
+.dark .text-slate-950 { color: #ffffff !important; }
+.dark .text-slate-900 { color: #f8fafc !important; }
+.dark .text-slate-800 { color: #f1f5f9 !important; }
+.dark .text-slate-700 { color: #e2e8f0 !important; }
+.dark .text-slate-600 { color: #cbd5e1 !important; }
+.dark .text-slate-500 { color: #94a3b8 !important; }
+.dark .text-slate-400 { color: #cbd5e1 !important; }
+.dark .text-slate-350 { color: #e2e8f0 !important; }
+.dark .text-slate-300 { color: #f1f5f9 !important; }
