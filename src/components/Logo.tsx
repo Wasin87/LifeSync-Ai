@@ -8,7 +8,7 @@ interface LogoProps {
 }
 
 /**
- * Unique, highly polished custom heartbeat brand icon for Healix AI.
+ * Unique, highly polished custom heartbeat brand icon for LifeSync Ai.
  * Merges a high-fidelity vector heart rate ECG waveform with an AI smart spark capsule.
  */
 export function LogoIcon({ size = 'md', animate = true, className = "" }: LogoProps) {

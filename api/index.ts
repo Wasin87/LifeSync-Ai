@@ -142,7 +142,7 @@ function getFallbackCase(userText: string, language: 'en' | 'bn') {
 }
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "active", engine: "Healix Vercel API" });
+  res.json({ status: "active", engine: "LifeSync Vercel API" });
 });
 
 app.post("/api/chat", async (req, res) => {
@@ -152,7 +152,7 @@ app.post("/api/chat", async (req, res) => {
   if (ai) {
     try {
       const systemInstruction = 
-        `You are the clinical intelligence backend of Healix AI.
+        `You are the clinical intelligence backend of LifeSync Ai.
         Provide highly structured, ethical, accessible digital health triage assessments.
         You must return feedback in the language specified: ${language === 'bn' ? 'Bangla' : 'English'}.
         Always align with global clinical definitions from ICD-11, WHO, and BMDC.

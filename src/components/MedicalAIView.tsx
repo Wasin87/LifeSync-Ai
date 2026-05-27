@@ -23,8 +23,8 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
       id: 'welcome-msg',
       sender: 'ai',
       text: lang === 'en' 
-        ? "Hello, I am Healix AI’s Medical AI Assistant. Specify your clinical indicators, upload scan files, or select one of our preloaded clinical samples below to initiate immediate diagnostic analysis."
-        : "নমস্কার, আমি হিলিক্স মেডিকেল এআই। আপনার লক্ষণসমূহ লিখুন, রোগ নির্ণয়ের রিপোর্ট আপলোড করুন অথবা নিচে দেওয়া ক্লিনিকাল ফাইলটি নির্বাচন করে এআই বিশ্লেষণ পরীক্ষা করুন।",
+        ? "Hello, I am LifeSync Ai’s Medical AI Assistant. Specify your clinical indicators, upload scan files, or select one of our preloaded clinical samples below to initiate immediate diagnostic analysis."
+        : "নমস্কার, আমি লাইফসিঙ্ক মেডিকেল এআই। আপনার লক্ষণসমূহ লিখুন, রোগ নির্ণয়ের রিপোর্ট আপলোড করুন অথবা নিচে দেওয়া ক্লিনিকাল ফাইলটি নির্বাচন করে এআই বিশ্লেষণ পরীক্ষা করুন।",
       timestamp: new Date().toLocaleTimeString(),
     }
   ]);
@@ -294,7 +294,7 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
               <div className="max-w-[80%] rounded-2xl rounded-tl-none p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3">
                 <RefreshCw className="w-4 h-4 text-purple-500 animate-spin" />
                 <p className="text-xs text-slate-500">
-                  {lang === 'en' ? "Healix RAG model reasoning..." : "হিলিক্স ক্লিনিকাল ডেটাবেস স্ক্যান করা হচ্ছে..."}
+                  {lang === 'en' ? "LifeSync RAG model reasoning..." : "লাইফসিঙ্ক ক্লিনিকাল ডেটাবেস স্ক্যান করা হচ্ছে..."}
                 </p>
               </div>
             </div>
