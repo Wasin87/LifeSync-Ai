@@ -30,7 +30,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[LifeSync OS Core] Running securely on port ${PORT}`);
+    console.log(`[Healix OS Core] Running securely on port ${PORT}`);
   });
 }
 

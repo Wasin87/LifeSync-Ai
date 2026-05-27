@@ -1,5 +1,5 @@
 {
-  "name": "LifeSync AI",
+  "name": "Healix AI",
   "description": "Smart personalized life, medical, maternal, and telehealth management companion powered by advanced AI and resilient offline-sync capabilities.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -39,7 +39,7 @@ export interface NutritionPlan {
 
 export const BanglaTranslations = {
   // Navigation & Brand
-  brandName: "লাইফসিঙ্ক এআই",
+  brandName: "হিলিক্স এআই",
   brandSubtitle: "অ্যাক্সেসিবল ও এথিক্যাল এআই কেয়ার",
   home: "হোম",
   medicalAi: "মেডিকেল এআই অ্যাসিস্ট্যান্ট",
@@ -74,7 +74,7 @@ export const BanglaTranslations = {
   lowRisk: "স্বল্প ঝুঁকি (স্ব-যত্ন)",
 
   // Main UI Text
-  welcomeBack: "স্বাগতম LifeSync AI-তে",
+  welcomeBack: "স্বাগতম Healix AI-তে",
   tagline: "গ্রামীণ ও শহরের স্বাস্থ্যসেবা রূপান্তরকারী এআই চালিত অপারেটিং সিস্টেম।",
   heroDescription: "আমাদের উন্নত ও নৈতিক আরএজি পাইপলাইন, দূরবর্তী অফলাইন সিঙ্ক এবং মাতৃস্বাস্থ্য পর্যবেক্ষণ ব্যবস্থা সরাসরি প্রত্যন্ত অঞ্চলে স্বাস্থ্যসেবা পৌঁছে দেয়।",
   exploreFeatures: "ফিচারসমূহ অন্বেষণ করুন",
@@ -94,7 +94,7 @@ export const BanglaTranslations = {
 
 export const EnglishTranslations = {
   // Navigation & Brand
-  brandName: "LifeSync AI",
+  brandName: "Healix AI",
   brandSubtitle: "Accessible & Ethical AI Care",
   home: "Home",
   medicalAi: "Medical AI Assistant",
@@ -129,7 +129,7 @@ export const EnglishTranslations = {
   lowRisk: "Low Risk (Self-Care)",
 
   // Main UI Text
-  welcomeBack: "Welcome to LifeSync AI",
+  welcomeBack: "Welcome to Healix AI",
   tagline: "An AI-powered operating system transforming rural & urban healthcare.",
   heroDescription: "Our advanced ethical RAG pipeline, remote offline-first sync engine, and maternal-fetal monitoring protocols directly connect patients with clinical safety safeguards anywhere in the world.",
   exploreFeatures: "Explore Ecosystem",

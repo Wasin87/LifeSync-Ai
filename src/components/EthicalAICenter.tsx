@@ -101,7 +101,7 @@ export default function EthicalAICenter({ lang }: EthicalAICenterProps) {
 
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             {lang === 'en' 
-              ? "Algorithmic bias evaluates diagnostic accuracy deviations between rural vs urban and male vs female cohorts. LifeSync AI ensures demographic parity."
+              ? "Algorithmic bias evaluates diagnostic accuracy deviations between rural vs urban and male vs female cohorts. Healix AI ensures demographic parity."
               : "গ্রামাঞ্চল বনাম শহরাঞ্চল এবং পুরুষ বনাম নারী রোগীদের রোগ নির্ণয়ে এআই এর নির্ভুলতার কোনো তারতম্য বা বৈষম্য ঘটছে কিনা তা পর্যবেক্ষণ করা হয়:"}
           </p>
 
