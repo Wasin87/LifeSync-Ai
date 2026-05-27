@@ -20,6 +20,7 @@ import EthicalAICenter from './components/EthicalAICenter.js';
 import EmergencyAIView from './components/EmergencyAIView.js';
 import AdminAnalyticsView from './components/AdminAnalyticsView.js';
 import SettingsView from './components/SettingsView.js';
+import { LogoIcon, LogoFull } from './components/Logo.js';
 
 type Tab = 
   | 'HOME' 
@@ -107,20 +108,8 @@ export default function App() {
       <aside className="hidden lg:flex flex-col w-72 shrink-0 glass-card-light dark:glass-card-dark border-r border-slate-200/60 dark:border-purple-950/40 sticky top-0 h-screen overflow-y-auto p-5 z-20">
         
         {/* Logo and Brand Identity */}
-        <div className="space-y-1 select-none pb-4 border-b border-slate-100 dark:border-purple-950/40">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2.5 rounded-xl bg-purple-600 text-white shadow shadow-purple-500/35">
-              <Activity className="w-5.5 h-5.5 animate-pulse" />
-            </span>
-            <div>
-              <h1 className="font-extrabold tracking-tight text-md text-slate-900 dark:text-white font-sans flex items-center gap-1.5 leading-none">
-                {t.brandName}
-              </h1>
-              <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold tracking-wider pt-1 font-mono uppercase">
-                {lang === 'en' ? "Clinician AI OS" : "এআই ক্লিনিক্যাল ওএস"}
-              </p>
-            </div>
-          </div>
+        <div className="select-none pb-4 border-b border-slate-100 dark:border-purple-950/40">
+          <LogoFull brandName={t.brandName} lang={lang} size="md" />
         </div>
 
         {/* Navigation lists */}
@@ -264,17 +253,7 @@ export default function App() {
                 <div className="absolute inset-0 cosmic-grid opacity-35 dark:opacity-60 pointer-events-none z-0"></div>
 
                 <div className="relative z-10 flex justify-between items-center pb-5 border-b border-slate-150 dark:border-purple-950/40">
-                  <div className="flex items-center gap-2.5">
-                    <span className="p-2 rounded-xl bg-purple-600 text-white shadow shadow-purple-500/35">
-                      <Activity className="w-4.5 h-4.5 animate-pulse" />
-                    </span>
-                    <div>
-                      <span className="font-extrabold tracking-tight text-slate-950 dark:text-white text-sm font-sans">{t.brandName}</span>
-                      <p className="text-[9px] text-purple-600 dark:text-purple-400 font-bold tracking-widest font-mono">
-                        {lang === 'en' ? "Clinician AI OS" : "এআই ক্লিনিক্যাল ওএস"}
-                      </p>
-                    </div>
-                  </div>
+                  <LogoFull brandName={t.brandName} lang={lang} size="sm" />
                   <button 
                     onClick={() => setIsMobileMenuOpen(false)} 
                     className="p-1.5 rounded-xl bg-slate-100 dark:bg-purple-950/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors"
@@ -382,13 +361,8 @@ export default function App() {
         <footer className="bg-slate-100 dark:bg-slate-900/60 border-t border-slate-200/50 dark:border-slate-850 pt-10 pb-24 lg:pb-8 w-full px-6 sm:px-10 lg:px-16 mt-auto">
           <div className="max-w-[1500px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div className="col-span-1 md:col-span-1">
-              <div className="flex items-center gap-2.5 mb-4">
-                <span className="p-2 rounded-xl bg-purple-600 text-white shadow shadow-purple-500/35">
-                  <Activity className="w-4 h-4 animate-pulse" />
-                </span>
-                <span className="font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 leading-none">
-                  {t.brandName}
-                </span>
+              <div className="mb-4">
+                <LogoFull brandName={t.brandName} lang={lang} size="sm" />
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                 Empowering healthcare professionals and patients with AI-driven, accessible, and ethical clinical tools for a brighter, healthier tomorrow.

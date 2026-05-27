@@ -5,6 +5,7 @@ import {
   ChevronRight, Brain, Sparkles, TrendingUp, Compass, Award, ShieldCheck, Cpu
 } from 'lucide-react';
 import { getTranslation, Language } from '../types.js';
+import { LogoIcon } from './Logo.js';
 
 interface HomeViewProps {
   lang: Language;
@@ -120,8 +121,8 @@ export default function HomeView({ lang, onNavigate, online }: HomeViewProps) {
         variants={itemVariants} 
         className="relative p-6 md:p-12 rounded-3xl overflow-hidden glass-card-light dark:glass-card-dark border border-purple-500/25 dark:border-purple-500/30 flex flex-col justify-between gap-6 glow-purple"
       >
-        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none select-none">
-          <Activity className="w-64 h-64 text-purple-600 dark:text-purple-400" />
+        <div className="absolute -top-10 -right-10 p-8 opacity-10 pointer-events-none select-none scale-150 origin-top-right">
+          <LogoIcon size="massive" />
         </div>
         
         {/* Glow Spheres */}
@@ -158,9 +159,9 @@ export default function HomeView({ lang, onNavigate, online }: HomeViewProps) {
             <button 
               id="hero-chat-btn"
               onClick={() => onNavigate('chat')} 
-              className="px-6 py-3 rounded-xl font-bold bg-white/80 dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-purple-500/20 transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer select-none"
+              className="px-6 py-3 rounded-xl font-bold bg-white/80 dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-purple-500/20 transition-all flex items-center gap-2.5 hover:scale-[1.02] active:scale-95 cursor-pointer select-none"
             >
-              <Activity className="w-4.5 h-4.5 text-purple-500" />
+              <LogoIcon size="sm" animate={false} />
               {lang === 'en' ? "Open AI Consult" : "এআই কনসাল্ট শুরু করুন"}
               <ChevronRight className="w-4 h-4 text-purple-500" />
             </button>
