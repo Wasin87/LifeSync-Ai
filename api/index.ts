@@ -142,7 +142,7 @@ function getFallbackCase(userText: string, language: 'en' | 'bn') {
 }
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "active", engine: "LifeSync Vercel API" });
+  res.json({ status: "active", engine: "LifeSync Ai Vercel API" });
 });
 
 app.post("/api/chat", async (req, res) => {
