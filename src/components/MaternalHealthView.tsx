@@ -21,12 +21,17 @@ export default function MaternalHealthView({ lang }: MaternalHealthViewProps) {
   const [kickHistory, setKickHistory] = useState<{ time: string; count: number }[]>([]);
 
   // Clinical risk assessment inputs
-  const [systolic, setSystolic] = useState("120");
-  const [diastolic, setDiastolic] = useState("80");
-  const [bloodSugar, setBloodSugar] = useState("5.6"); // mmol/L
-  const [hemoglobin, setHemoglobin] = useState("11.5"); // g/dL
-  const [weight, setWeight] = useState("64");
+  const [systolic, setSystolic] = useState("135");
+  const [diastolic, setDiastolic] = useState("85");
+  const [bloodSugar, setBloodSugar] = useState("6.2"); // mmol/L
+  const [hemoglobin, setHemoglobin] = useState("10.5"); // g/dL
+  const [weight, setWeight] = useState("68");
   const [height, setHeight] = useState("155"); // cm
+  const [maternalAge, setMaternalAge] = useState("28");
+  const [prevComplications, setPrevComplications] = useState("None");
+  
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Low bandwidth display override
   const [lowBandwidthMode, setLowBandwidthMode] = useState(false);
@@ -86,69 +91,57 @@ export default function MaternalHealthView({ lang }: MaternalHealthViewProps) {
   };
 
   // Logic threshold risks detector
-  const checkMaternalMutedFactors = () => {
-    const sysNum = parseInt(systolic) || 120;
-    const diaNum = parseInt(diastolic) || 80;
-    const bsNum = parseFloat(bloodSugar) || 5.6;
-    const hbNum = parseFloat(hemoglobin) || 12.0;
+  const handleRunAnalysis = () => {
+    setIsAnalyzing(true);
+    
+    setTimeout(() => {
+      const sysNum = parseInt(systolic) || 120;
+      const diaNum = parseInt(diastolic) || 80;
+      const bsNum = parseFloat(bloodSugar) || 5.6;
+      const hbNum = parseFloat(hemoglobin) || 12.0;
+      const wNum = parseFloat(weight) || 64;
+      const hNum = parseFloat(height) || 155;
+      const mAge = parseInt(maternalAge) || 28;
 
-    const risksDetected: { title: string; category: 'RED' | 'YELLOW' | 'GREEN'; text: string }[] = [];
+      const bmi = wNum / Math.pow(hNum / 100, 2);
+      
+      let preEclampsiaScore = 10;
+      if (sysNum > 130 || diaNum > 85) preEclampsiaScore += 30;
+      if (sysNum > 140 || diaNum > 90) preEclampsiaScore += 40;
+      if (prevComplications.includes("Pre-eclampsia")) preEclampsiaScore += 20;
+      
+      let gdmScore = 10;
+      if (bsNum > 6.0) gdmScore += 30;
+      if (bsNum > 7.0) gdmScore += 50;
+      if (bmi > 25) gdmScore += 20;
 
-    // Pre-eclampsia: gestational HTN + headache warning signs
-    if (sysNum >= 140 || diaNum >= 90) {
-      if (sysNum >= 160 || diaNum >= 110) {
-        risksDetected.push({
-          title: lang === 'en' ? "Severe Safe Pre-eclampsia Risk!" : "উচ্চ এক্লাম্পসিয়া খিঁচুনি ঝুঁকি!",
-          category: "RED",
-          text: lang === 'en' ? "Urgent transfer, IV Magnesium Sulfate required immediately." : "জরুরিভাবে হাসপাতালে স্থানান্তরের নির্দেশ এবং ম্যাগনেসিয়াম সালফেট দেওয়া প্রয়োজন।"
-        });
-      } else {
-        risksDetected.push({
-          title: lang === 'en' ? "Gestational Hypertension Risk" : "গর্ভকালীন উচ্চ রক্তচাপ",
-          category: "YELLOW",
-          text: lang === 'en' ? "Blood pressure elevated above 140/90. Daily checking is critical." : "রক্তচাপ ১৪০/৯০ এর উপরে। নিয়মিত লবণ বাদ দিয়ে জীবনযাত্রা পরীক্ষা আবশ্যক।"
-        });
-      }
-    }
+      let anemiaScore = 10;
+      if (hbNum < 11.0) anemiaScore += 40;
+      if (hbNum < 9.0) anemiaScore += 40;
 
-    // Gestational diabetes
-    if (bsNum >= 7.8) {
-      risksDetected.push({
-        title: lang === 'en' ? "Gestational Diabetes Melitus Risk" : "গর্ভকালীন ডায়াবেটিস ঝুঁকি",
-        category: "YELLOW",
-        text: lang === 'en' ? "Blood sugar readings of >7.8 mmol/L. Regulate carbohydrate loads." : "খাবারের পরে রক্তে শর্করা ৭.৮ এর বেশি। সুজি ও অতিরিক্ত চিনি জাতীয় খাবার এড়িয়ে চলুন।"
+      let overallRisk = Math.max(preEclampsiaScore, gdmScore, anemiaScore);
+      let healthScore = 100 - (overallRisk * 0.8);
+      
+      const guidelines = [];
+      if (preEclampsiaScore > 50) guidelines.push(lang === 'en' ? "Elevated blood pressure indicates moderate-to-high pre-eclampsia risk. Immediate physician review and serial BP monitoring recommended." : "উচ্চ রক্তচাপ প্রি-এক্লাম্পসিয়ার ঝুঁকি নির্দেশ করে। দ্রুত চিকিৎসকের পরামর্শ নিন।");
+      if (gdmScore > 50) guidelines.push(lang === 'en' ? "High fasting/random blood sugar levels suggest possible Gestational Diabetes. OGTT test advised." : "রক্তে শর্করার মাত্রা বেশি যা গর্ভকালীন ডায়াবেটিসের লক্ষণ হতে পারে। ওজিটিটি পরীক্ষা করানো প্রয়োজন।");
+      if (anemiaScore > 50) guidelines.push(lang === 'en' ? "Reduced hemoglobin shows active maternal anemia. Iron infusion or high-iron dietary supplements (IFA) required." : "হিমোগ্লোবিন কম থাকার কারণে রক্তস্বল্পতা দেখা দিয়েছে। আয়রন ট্যাবলেট বা ইনফিউশন প্রয়োজন।");
+      
+      if (guidelines.length === 0) guidelines.push(lang === 'en' ? "Maternal vitals are stable. Continue regular antenatal checkups." : "বর্তমান স্বাস্থ্য সূচকগুলো স্বাভাবিক রয়েছে। নিয়মিত চেকআপ বজায় রাখুন।");
+
+      setAnalysisResult({
+        bmi: bmi.toFixed(1),
+        healthScore: Math.round(healthScore),
+        riskScore: Math.round(overallRisk),
+        preEclampsiaRisk: preEclampsiaScore > 70 ? 'High' : preEclampsiaScore > 40 ? 'Moderate' : 'Low',
+        gdmRisk: gdmScore > 70 ? 'High' : gdmScore > 40 ? 'Moderate' : 'Low',
+        anemiaRisk: anemiaScore > 70 ? 'High' : anemiaScore > 40 ? 'Moderate' : 'Low',
+        guidelines
       });
-    }
 
-    // Severe anemia
-    if (hbNum < 11.0) {
-      if (hbNum < 8.0) {
-        risksDetected.push({
-          title: lang === 'en' ? "Severe Microcytic Anemia!" : "গুরুতর রক্তস্বল্পতা রোগ!",
-          category: "RED",
-          text: lang === 'en' ? "Hemoglobin dangerously low. Iron infusion or transfusion required." : "রক্তে হিমোগ্লোবিন ৮ এর নিচে। আইরন থেরাপি বা জরুরি রক্ত চালনার পরামর্শ।"
-        });
-      } else {
-        risksDetected.push({
-          title: lang === 'en' ? "Mild Gestational Anemia" : "হালকা অ্যানিমিয়া ঝুঁকি",
-          category: "YELLOW",
-          text: lang === 'en' ? "Maintain iron-rich local dietary greens (Lal Shak, Moringa leaves)." : "আয়রন সমৃদ্ধ খাবার (লাল শাক, সাজনে শাক, গুড় ও কলিজা) বেশি খান।"
-        });
-      }
-    }
-
-    if (risksDetected.length === 0) {
-      risksDetected.push({
-        title: lang === 'en' ? "Optimal Maternal Health Vitals" : "স্বাভাবিক মাতৃত্বকালীন স্বাস্থ্য",
-        category: "GREEN",
-        text: lang === 'en' ? "All measured clinical markers align with baseline requirements." : "হিমোগ্লোবিন, শর্করা ও রক্তচাপ পরিমাপ স্বাভাবিক রয়েছে।"
-      });
-    }
-
-    return risksDetected;
+      setIsAnalyzing(false);
+    }, 1500);
   };
-
-  const detectedRisks = checkMaternalMutedFactors();
 
   return (
     <div className={`space-y-8 animate-fade-in ${lowBandwidthMode ? 'contrast-125 saturate-50' : ''}`}>
@@ -312,7 +305,7 @@ export default function MaternalHealthView({ lang }: MaternalHealthViewProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
             <label className="text-xs font-semibold text-slate-500">{lang === 'en' ? "BP Systolic (mmHg)" : "রক্তচাপ সিস্টোলিক"}</label>
             <input
@@ -375,62 +368,124 @@ export default function MaternalHealthView({ lang }: MaternalHealthViewProps) {
               className="w-full p-2 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm text-slate-800 dark:text-white"
             />
           </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-500">{lang === 'en' ? "Maternal Age" : "মায়ের বয়স"}</label>
+            <input
+              id="maternal-age-input"
+              type="number"
+              value={maternalAge}
+              onChange={(e) => setMaternalAge(e.target.value)}
+              className="w-full p-2 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm text-slate-800 dark:text-white"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-500">{lang === 'en' ? "Prev. Complications" : "পূর্ববর্তী জটিলতা"}</label>
+            <select
+              value={prevComplications}
+              onChange={(e) => setPrevComplications(e.target.value)}
+              className="w-full p-2 bg-slate-500/5 rounded-xl border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-purple-500 text-sm text-slate-800 dark:text-white"
+            >
+              <option value="None">{lang === 'en' ? "None" : "কোনটি নয়"}</option>
+              <option value="Pre-eclampsia">{lang === 'en' ? "Pre-eclampsia" : "প্রি-এক্লাম্পসিয়া"}</option>
+              <option value="GDM">{lang === 'en' ? "Gestational Diabetes" : "গর্ভকালীন ডায়াবেটিস"}</option>
+              <option value="Anemia">{lang === 'en' ? "Severe Anemia" : "মারাত্মক রক্তাল্পতা"}</option>
+            </select>
+          </div>
         </div>
 
-        {/* Predictive risk outcome status display */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl border border-dashed border-purple-500/20 bg-purple-500/5 space-y-3">
-            <p className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
-              {lang === 'en' ? "Clinical Risk Signals Analyzed" : "বিশ্লেষিত এআই সঙ্কেতসমূহ"}
-            </p>
-            <div className="space-y-3">
-              {detectedRisks.map((risk, index) => (
-                <div key={index} className="flex gap-3 items-start">
-                  {risk.category === 'RED' ? (
-                    <span className="p-1 px-1.5 rounded-md bg-red-100 text-red-600 font-extrabold text-[10px] shrink-0 mt-0.5">RED</span>
-                  ) : risk.category === 'YELLOW' ? (
-                    <span className="p-1 px-1.5 rounded-md bg-amber-100 text-amber-600 font-extrabold text-[10px] shrink-0 mt-0.5">YEL</span>
-                  ) : (
-                    <span className="p-1 px-1.5 rounded-md bg-emerald-100 text-emerald-600 font-extrabold text-[10px] shrink-0 mt-0.5">OK</span>
-                  )}
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-bold text-slate-800 dark:text-white">{risk.title}</p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{risk.text}</p>
+        <button 
+          onClick={handleRunAnalysis}
+          disabled={isAnalyzing}
+          className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition-all flex items-center justify-center gap-2"
+        >
+          {isAnalyzing ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <Activity className="w-5 h-5" />
+          )}
+          {lang === 'en' ? "Run Maternal Risk Analysis" : "মাতৃত্বকালীন ঝুঁকি বিশ্লেষণ করুন"}
+        </button>
+
+        {analysisResult && (
+          <div className="space-y-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Circular Health Score */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 flex flex-col items-center justify-center text-center space-y-2">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{lang === 'en' ? "Maternal Health Score" : "মাতৃস্বাস্থ্য স্কোর"}</p>
+                <div className="relative w-32 h-32 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-200 dark:text-slate-800" />
+                    <circle 
+                      cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" 
+                      strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * analysisResult.healthScore) / 100}
+                      className={analysisResult.healthScore > 80 ? 'text-emerald-500' : analysisResult.healthScore > 50 ? 'text-amber-500' : 'text-red-500'} 
+                      strokeLinecap="round" 
+                    />
+                  </svg>
+                  <div className="absolute text-3xl font-black text-slate-800 dark:text-white">
+                    {analysisResult.healthScore}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="text-[10px] text-slate-500">Auto-computed BMI: <span className="font-bold text-slate-700 dark:text-slate-300">{analysisResult.bmi}</span></div>
+              </div>
 
-          {/* Local Nutrition suggestions */}
-          <div className="p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-3">
-            <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1">
-              <Apple className="w-4 h-4" />
-              {lang === 'en' ? "Local high-absorption clinical dietary items" : "আয়রণ ও ক্যালসিয়াম শোষক পুষ্টিকর খাবার"}
-            </h4>
-            <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
-              <div className="flex gap-1.5 items-center">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>লাল শাক (Iron rich)</span>
-              </div>
-              <div className="flex gap-1.5 items-center">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>কলিজা ও ডিম (Folate source)</span>
-              </div>
-              <div className="flex gap-1.5 items-center">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>সাজনে পাতা (Moringa calcium)</span>
-              </div>
-              <div className="flex gap-1.5 items-center">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>আমলকী ও লেবু (Vitamin C absorption)</span>
+              {/* Risk Meters */}
+              <div className="md:col-span-2 space-y-4">
+                 <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">{lang === 'en' ? "Risk Breakdown" : "ঝুঁকি বিশ্লেষণ"}</h4>
+                 
+                 <div className="space-y-3 font-mono text-xs">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Pre-eclampsia Risk</span>
+                        <span className={`font-bold ${analysisResult.preEclampsiaRisk === 'High' ? 'text-red-500' : analysisResult.preEclampsiaRisk === 'Moderate' ? 'text-amber-500' : 'text-emerald-500'}`}>{analysisResult.preEclampsiaRisk}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className={`h-full ${analysisResult.preEclampsiaRisk === 'High' ? 'bg-red-500 w-4/5' : analysisResult.preEclampsiaRisk === 'Moderate' ? 'bg-amber-500 w-1/2' : 'bg-emerald-500 w-1/5'}`}></div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Gestational Diabetes Risk</span>
+                        <span className={`font-bold ${analysisResult.gdmRisk === 'High' ? 'text-red-500' : analysisResult.gdmRisk === 'Moderate' ? 'text-amber-500' : 'text-emerald-500'}`}>{analysisResult.gdmRisk}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className={`h-full ${analysisResult.gdmRisk === 'High' ? 'bg-red-500 w-4/5' : analysisResult.gdmRisk === 'Moderate' ? 'bg-amber-500 w-1/2' : 'bg-emerald-500 w-1/5'}`}></div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Maternal Anemia Risk</span>
+                        <span className={`font-bold ${analysisResult.anemiaRisk === 'High' ? 'text-red-500' : analysisResult.anemiaRisk === 'Moderate' ? 'text-amber-500' : 'text-emerald-500'}`}>{analysisResult.anemiaRisk}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className={`h-full ${analysisResult.anemiaRisk === 'High' ? 'bg-red-500 w-4/5' : analysisResult.anemiaRisk === 'Moderate' ? 'bg-amber-500 w-1/2' : 'bg-emerald-500 w-1/5'}`}></div>
+                      </div>
+                    </div>
+                 </div>
               </div>
             </div>
-            <p className="text-[10px] leading-relaxed italic text-slate-400 mt-1">
-              {lang === 'en' ? "Ensures optimal maternal hemoglobin absorption rates under low budgetary requirements." : "গ্রামাঞ্চলে স্বল্প খরচে গর্ভবতীদের হিমোগ্লোবিনের মাত্রা বাড়াতে বিশেষ সুপারিশ।"}
-            </p>
+
+            {/* Clinical Summary Cards */}
+            <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 space-y-3">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-purple-600" />
+                {lang === 'en' ? "Clinical Notes & Next Steps" : "ক্লিনিকাল নোট এবং পরবর্তী পদক্ষেপ"}
+              </h4>
+              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                {analysisResult.guidelines.map((g: string, i: number) => (
+                  <li key={i} className="flex gap-2 items-start">
+                    <span className="text-purple-500 mt-0.5">•</span>
+                    <span>{g}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { 
   Sparkles, Apple, Salad, HelpCircle, Activity, 
-  ChevronRight, ArrowRight, HeartPulse, CheckSquare, RefreshCw
+  ChevronRight, ArrowRight, HeartPulse, CheckSquare, RefreshCw, Flame, DollarSign, Pill
 } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { getTranslation, Language } from '../types.js';
 
 interface NutritionAIViewProps {
   lang: Language;
 }
-
-const LOCAL_FOODS_DB = [
-  { name: lang => lang === 'en' ? "Khichuri (Rice, Lentil, Egg)" : "ডিম দিয়ে খিচুড়ি", calories: 450, macros: { carb: 58, protein: 18, fat: 12 }, healthScore: 92, cost: "Low", category: "High Protein Folate" },
-  { name: lang => lang === 'en' ? "Lal Shak (Red Amaranth Leaf)" : "লাল শাক ভাজি", calories: 45, macros: { carb: 6, protein: 3, fat: 0.5 }, healthScore: 98, cost: "Very Low", category: "Micro Nutrition Iron" },
-  { name: lang => lang === 'en' ? "Ruti with Lentil Dal" : "রুটি এবং মসুর ডাল", calories: 280, macros: { carb: 42, protein: 11, fat: 4 }, healthScore: 88, cost: "Low", category: "Starch & Fibre" },
-  { name: lang => lang === 'en' ? "local Deshi Guava (Peyara)" : "দেশি পেয়ারা", calories: 60, macros: { carb: 14, protein: 1.2, fat: 0.2 }, healthScore: 96, cost: "Very Low", category: "Vitamin C booster" }
-];
 
 const DIET_TEMPLATES = {
   PREG: {
@@ -44,20 +38,39 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
   const t = getTranslation(lang);
   
   // Scanning active states
+  const [foodInput, setFoodInput] = useState('');
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<typeof LOCAL_FOODS_DB[0] | null>(null);
+  const [scanResult, setScanResult] = useState<any>(null);
   const [activeGroup, setActiveGroup] = useState<keyof typeof DIET_TEMPLATES>('PREG');
 
-  const startFoodScan = (item: typeof LOCAL_FOODS_DB[0]) => {
+  const startFoodScan = () => {
+    if (!foodInput.trim()) return;
     setIsScanning(true);
     setScanResult(null);
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult(item);
-    }, 2000);
+      setScanResult({
+        name: foodInput,
+        calories: 320,
+        macros: { carb: 45, protein: 12, fat: 8 },
+        micros: { fiber: 6.5, iron: 4.2, calcium: 150 },
+        healthScore: 84,
+        rating: 'Excellent',
+        riskIndicators: ['High Carb', 'Balanced Protein'],
+        summary: lang === 'en' ? "This combination provides slow-release carbohydrates beneficial for sustained energy, with an adequate micronutrient profile. Watch out for added sodium." : "এই খাবারে শর্করা এবং প্রোটিন ব্যালেন্সড অবস্থায় রয়েছে যা শরীরে দীর্ঘক্ষণ কাজ করার এনার্জি দেবে।",
+        budget: "Low ($0.40/meal)",
+        recommendations: [lang === 'en' ? "Add a side of leafy greens for iron" : "লৌহ পূরণে লাল শাক যোগ করুন", lang === 'en' ? "Avoid extra salt" : "বাড়তি লবণ পরিহার করুন"]
+      });
+    }, 2500);
   };
 
   const diet = DIET_TEMPLATES[activeGroup];
+
+  const pieData = scanResult ? [
+    { name: 'Carbs', value: scanResult.macros.carb, color: '#a855f7' },
+    { name: 'Protein', value: scanResult.macros.protein, color: '#06b6d4' },
+    { name: 'Fat', value: scanResult.macros.fat, color: '#f59e0b' },
+  ] : [];
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -65,111 +78,170 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
       {/* Upper scanning dashboard */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Preset selectors (5-cols) */}
+        {/* Input selectors (5-cols) */}
         <div className="lg:col-span-5 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4">
           <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold">
             <Salad className="w-5 h-5 animate-pulse" />
-            <h3>{lang === 'en' ? "Aura Nutrition scanner simulation" : "পুষ্টি স্ক্যান ল্যাব"}</h3>
+            <h3>{lang === 'en' ? "Aura Nutrition Scanner Simulation" : "পুষ্টি স্ক্যান ল্যাব"}</h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {lang === 'en' 
-              ? "Select from local Bangladeshi budget food items to simulate an AI snapshot scan."
-              : "নিচে দেওয়া স্থানীয় বাজেট উপযোগী খাবারগুলোর একটি নির্বাচন করে সেকেন্ডে স্ক্যান রিপোর্ট দেখুন:"}
+              ? "Enter local Bangladeshi meals (e.g. 'Khichuri with egg' or 'Lal Shak') to simulate an AI nutrition snapshot."
+              : "স্থানীয় যেকোনো বাঙালি খাবারের নাম (যেমন: ডিম-খিচুড়ি বা লাল শাক) লিখে স্ক্যান করুন:"}
           </p>
 
-          <div className="space-y-2.5">
-            {LOCAL_FOODS_DB.map((food, idx) => (
-              <button
-                key={idx}
-                id={`btn-scan-food-${idx}`}
-                onClick={() => startFoodScan(food)}
-                className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-500/5 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all text-xs flex items-center justify-between group"
-              >
-                <div>
-                  <p className="font-bold text-slate-800 dark:text-white">{food.name(lang)}</p>
-                  <p className="text-[10px] text-slate-400 uppercase font-mono">{food.category}</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 group-hover:text-purple-500 transition-all shrink-0" />
-              </button>
-            ))}
+          <div className="space-y-3 pt-2">
+            <div className="space-y-1">
+               <label className="text-[11px] font-bold text-slate-500 uppercase">{lang === 'en' ? "Local Food Input" : "খাবারের নাম"}</label>
+               <input
+                 type="text"
+                 value={foodInput}
+                 onChange={(e) => setFoodInput(e.target.value)}
+                 placeholder={lang === 'en' ? "e.g. Ruti with Lentil Dal" : "যেমন: রুটি ও ডাল"}
+                 className="w-full p-2.5 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-purple-500/50"
+               />
+            </div>
+            <button
+               onClick={startFoodScan}
+               disabled={isScanning || !foodInput.trim()}
+               className="w-full py-2.5 rounded-xl font-bold text-xs bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-2 transition-all shadow"
+            >
+               {isScanning ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+               {lang === 'en' ? "Analyze Nutrition AI" : "পুষ্টিগুণ যাচাই করুন"}
+            </button>
           </div>
+
+          {!isScanning && !scanResult && (
+             <div className="mt-4 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-[10px] text-slate-500 space-y-1 font-mono">
+                <p>Popular entries to try:</p>
+                <div className="flex gap-2 flex-wrap">
+                   <span onClick={() => setFoodInput('Mashed Potato & Rice')} className="cursor-pointer hover:text-indigo-500">Mashed Potato & Rice</span>
+                   <span onClick={() => setFoodInput('Rui Fish Curry')} className="cursor-pointer hover:text-indigo-500">Rui Fish Curry</span>
+                   <span onClick={() => setFoodInput('Panta Ilish')} className="cursor-pointer hover:text-indigo-500">Panta Ilish</span>
+                </div>
+             </div>
+          )}
         </div>
 
         {/* Scan outcome panel (7-cols) */}
         <div className="lg:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 flex flex-col justify-between">
-          <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2">
+          <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2 mb-4">
             <Sparkles className="w-4.5 h-4.5 text-purple-500" />
             {lang === 'en' ? "AI Food Scanner Diagnostic Outcome" : "স্ক্যানার ডায়াগনস্টিক রিপোর্ট"}
           </h3>
 
-          <div className="flex-1 flex flex-col justify-center py-4">
+          <div className="flex-1 flex flex-col">
             {isScanning ? (
-              <div className="text-center space-y-3">
-                <RefreshCw className="w-8 h-8 text-purple-500 animate-spin mx-auto" />
-                <p className="text-xs text-slate-500">{lang === 'en' ? "Extracting macronutrients and micronutrient metrics..." : "খাবারের পুষ্টিগুণ এআই দ্বারা বিশ্লেষণ করা হচ্ছে..."}</p>
+              <div className="flex-1 flex flex-col justify-center items-center space-y-4">
+                <RefreshCw className="w-10 h-10 text-purple-500 animate-spin" />
+                <p className="text-xs font-bold text-slate-500">{lang === 'en' ? "Analyzing macro-distribution & micros..." : "পুষ্টিগুণ এআই দ্বারা বিশ্লেষণ করা হচ্ছে..."}</p>
               </div>
             ) : scanResult ? (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center bg-purple-500/5 p-3.5 rounded-xl border border-purple-500/10">
-                  <div>
-                    <h4 className="text-md font-bold text-purple-700 dark:text-purple-300">{scanResult.name(lang)}</h4>
-                    <span className="text-[10px] text-slate-400 font-mono">Caloric density: {scanResult.calories} kcal</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-black text-purple-600 dark:text-purple-300">{scanResult.healthScore}</p>
-                    <span className="text-[9px] uppercase tracking-wider font-mono text-slate-400">Health Score</span>
-                  </div>
+              <div className="space-y-6">
+                
+                {/* Header Metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                   <div className="p-3 bg-purple-500/5 border border-purple-500/10 rounded-xl text-center">
+                      <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{scanResult.healthScore}</div>
+                      <div className="text-[9px] font-bold uppercase text-slate-500">Nutrition Score</div>
+                   </div>
+                   <div className="p-3 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl text-center flex flex-col items-center justify-center">
+                      <div className="flex items-center gap-1 text-sm font-bold text-slate-700 dark:text-slate-300">
+                         <Flame className="w-4 h-4 text-orange-500" /> {scanResult.calories}
+                      </div>
+                      <div className="text-[9px] font-bold uppercase text-slate-500">Calories kcal</div>
+                   </div>
+                   <div className="p-3 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl text-center flex flex-col items-center justify-center">
+                      <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{scanResult.rating}</div>
+                      <div className="text-[9px] font-bold uppercase text-slate-500">Health Rating</div>
+                   </div>
+                   <div className="p-3 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl text-center flex flex-col items-center justify-center">
+                      <div className="flex items-center gap-1 text-sm font-bold text-slate-700 dark:text-slate-300">
+                         <DollarSign className="w-4 h-4 text-emerald-500" /> {scanResult.budget.split(' ')[0]}
+                      </div>
+                      <div className="text-[9px] font-bold uppercase text-slate-500">Budget Cost</div>
+                   </div>
                 </div>
 
-                {/* Macromolecules breakdown */}
-                <div className="space-y-2.5">
-                  <p className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Macronutrients Breakdown</p>
-                  
-                  {/* Carbs */}
-                  <div className="space-y-1 text-xs font-mono">
-                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                      <span>Glucose/Carbs</span>
-                      <span>{scanResult.macros.carb}g / 65%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-purple-500 h-full rounded-full" style={{ width: '65%' }}></div>
-                    </div>
-                  </div>
-
-                  {/* Protein */}
-                  <div className="space-y-1 text-xs font-mono">
-                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                      <span>Proteins</span>
-                      <span>{scanResult.macros.protein}g / 20%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-cyan-500 h-full rounded-full" style={{ width: '20%' }}></div>
-                    </div>
-                  </div>
-
-                  {/* Fat */}
-                  <div className="space-y-1 text-xs font-mono">
-                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                      <span>Lipids/Fat</span>
-                      <span>{scanResult.macros.fat}g / 15%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-amber-500 h-full rounded-full" style={{ width: '15%' }}></div>
-                    </div>
-                  </div>
+                {/* Macro & Micro Charts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="space-y-3">
+                      <p className="text-[10px] font-bold uppercase text-slate-500">Macro Distribution</p>
+                      <div className="h-32">
+                         <ResponsiveContainer width="100%" height="100%">
+                           <PieChart>
+                             <Pie
+                               data={pieData}
+                               cx="50%"
+                               cy="50%"
+                               innerRadius={30}
+                               outerRadius={50}
+                               paddingAngle={5}
+                               dataKey="value"
+                             >
+                               {pieData.map((entry, index) => (
+                                 <Cell key={`cell-${index}`} fill={entry.color} />
+                               ))}
+                             </Pie>
+                             <Tooltip 
+                               contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', fontSize: '12px', color: '#fff' }}
+                               itemStyle={{ color: '#fff' }}
+                             />
+                           </PieChart>
+                         </ResponsiveContainer>
+                      </div>
+                      <div className="flex justify-center gap-4 text-[9px] font-mono text-slate-500">
+                         <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-purple-500"></div>Carbs: {scanResult.macros.carb}g</span>
+                         <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-cyan-500"></div>Protein: {scanResult.macros.protein}g</span>
+                         <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div>Fat: {scanResult.macros.fat}g</span>
+                      </div>
+                   </div>
+                   
+                   <div className="space-y-3">
+                      <p className="text-[10px] font-bold uppercase text-slate-500">Micronutrient Profile</p>
+                      <div className="space-y-3 mt-4">
+                         <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                               <span>Fiber (Digestion)</span><span>{scanResult.micros.fiber}g</span>
+                            </div>
+                            <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full"><div className="bg-emerald-500 h-full rounded-full w-[65%]"></div></div>
+                         </div>
+                         <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                               <span>Iron (Anemia protection)</span><span>{scanResult.micros.iron}mg</span>
+                            </div>
+                            <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full"><div className="bg-rose-500 h-full rounded-full w-[45%]"></div></div>
+                         </div>
+                         <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                               <span>Calcium (Bone health)</span><span>{scanResult.micros.calcium}mg</span>
+                            </div>
+                            <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full"><div className="bg-blue-500 h-full rounded-full w-[35%]"></div></div>
+                         </div>
+                      </div>
+                   </div>
                 </div>
+
+                <div className="p-4 bg-slate-500/5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+                   <p className="text-[10px] font-bold uppercase text-slate-500">Clinical Summary</p>
+                   <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{scanResult.summary}</p>
+                   <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                      {scanResult.recommendations.map((r: string, i: number) => (
+                         <div key={i} className="flex flex-1 items-start gap-1 p-2 bg-emerald-500/10 rounded-md text-[10px] text-emerald-700 dark:text-emerald-400">
+                            <Pill className="w-3 h-3 shrink-0 mt-0.5" /> <span>{r}</span>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+
               </div>
             ) : (
-              <p className="text-xs text-center italic text-slate-400 py-6">
-                {lang === 'en' ? "Please scan a food component on the left sidebar." : "রিপোর্ট দেখতে বাঁদিকের ফুড ডায়াগনস্টিক বাটন এ ট্যাপ করুন।"}
-              </p>
+              <div className="flex-1 flex items-center justify-center">
+                 <p className="text-xs text-center italic text-slate-400 py-6">
+                   {lang === 'en' ? "Please type a food and hit analyze." : "রিপোর্ট দেখতে খাবার সার্চ করুন।"}
+                 </p>
+              </div>
             )}
-          </div>
-
-          <div className="p-3 bg-indigo-500/5 rounded-xl text-[11px] text-slate-500 dark:text-slate-400">
-            {lang === 'en' 
-              ? "All values are estimated according to localized nutritional scale benchmarks." 
-              : "পুষ্টিমানের অনুপাতগুলো স্থানীয় পুষ্টি তালিকা অনুসারে গণনা করা হয়েছে।"}
           </div>
         </div>
 

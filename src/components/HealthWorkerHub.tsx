@@ -15,6 +15,9 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
   
   // Intake list states
   const [patientName, setPatientName] = useState('');
+  const [village, setVillage] = useState('Dharmapur');
+  const [symptoms, setSymptoms] = useState('Headache, blurry vision');
+  const [priority, setPriority] = useState('High');
   const [age, setAge] = useState('32');
   const [gender, setGender] = useState('Female');
   const [systolic, setSystolic] = useState('120');
@@ -23,17 +26,44 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
   const [hemoglobin, setHemoglobin] = useState('11.8');
   const [maternalRisk, setMaternalRisk] = useState('Healthy prenatal');
 
+  // Extended Local Registry Type
+  interface ExtendedPatientRecord extends PatientRecord {
+    village?: string;
+    symptoms?: string;
+    priority?: string;
+    timestamp?: string;
+  }
+
   // Syncing states
-  const [localRegistry, setLocalRegistry] = useState<PatientRecord[]>([
-    { id: "PAT-OFF-1", name: "Morzina Begum", age: 34, gender: "Female", bp: "145/95", bloodSugar: "8.2", hemoglobin: 10.1, weight: 58, height: 150, maternalRisk: "Pre-eclampsia Risk", status: "pending" }
+  const [localRegistry, setLocalRegistry] = useState<ExtendedPatientRecord[]>([
+    { 
+      id: "PAT-OFF-1", 
+      name: "Morzina Begum", 
+      age: 34, 
+      gender: "Female", 
+      bp: "145/95", 
+      bloodSugar: "8.2", 
+      hemoglobin: 10.1, 
+      weight: 58, 
+      height: 150, 
+      maternalRisk: "Pre-eclampsia Risk", 
+      village: "Sonapur",
+      symptoms: "Severe headache, blurry vision",
+      priority: "High",
+      timestamp: "10:24 AM",
+      status: "pending" 
+    }
   ]);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
+  const [syncStage, setSyncStage] = useState('');
+  const [lastSync, setLastSync] = useState('Never');
   const [cloudSyncedCount, setCloudSyncedCount] = useState(3); // Initial DB records length
 
   // Voice scribe state
-  const [recordedScript, setRecordedScript] = useState("");
+  const [scribeInput, setScribeInput] = useState("");
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [scribeNotes, setScribeNotes] = useState("");
+  const [scribeNotes, setScribeNotes] = useState<any>(null);
 
   const whoProtocol = [
     { id: 'bp', label: lang === 'en' ? "Screening for high arterial pressure (Hypertension/Pre-eclampsia)" : "রক্তচাপ পরিমাপ (উচ্চ রক্তচাপ ও এক্লাম্পসিয়া প্রতিরোধ)" },
@@ -46,7 +76,7 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
     e.preventDefault();
     if (!patientName.trim()) return;
 
-    const newRecord: PatientRecord = {
+    const newRecord: ExtendedPatientRecord = {
       id: `PAT-OFF-${Date.now()}`,
       name: patientName,
       age: parseInt(age) || 30,
@@ -57,43 +87,62 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
       weight: 60,
       height: 154,
       maternalRisk: gender === 'Female' ? maternalRisk : undefined,
+      village,
+      symptoms,
+      priority,
+      timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
       status: 'pending'
     };
 
     setLocalRegistry(prev => [newRecord, ...prev]);
     setPatientName('');
-    setSystolic('120');
-    setDiastolic('80');
-    setSugar('6.0');
-    setHemoglobin('12.0');
+    setSymptoms('');
   };
 
   const handleCloudSync = async () => {
     setIsSyncing(true);
+    setSyncProgress(0);
+    setSyncStage(lang === 'en' ? 'Authenticating with edge node...' : 'এজ নোড যাচাই করা হচ্ছে...');
+    
     // Simulate API delay transmission
-    setTimeout(() => {
-      setLocalRegistry(prev => prev.map(p => ({ ...p, status: 'synced' })));
-      setCloudSyncedCount(prev => prev + localRegistry.filter(p => p.status === 'pending').length);
-      setIsSyncing(false);
-    }, 3000);
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 20;
+      setSyncProgress(progress);
+      if (progress === 40) setSyncStage(lang === 'en' ? 'Compressing patient payload...' : 'পেলোড কমপ্রেস করা হচ্ছে...');
+      if (progress === 60) setSyncStage(lang === 'en' ? 'Transmitting via low-bandwidth connection...' : 'লো-ব্যান্ডউইথ সংযোগে ট্রান্সফার হচ্ছে...');
+      if (progress === 80) setSyncStage(lang === 'en' ? 'Confirming FHIR database write...' : 'ডেটাবেইসে সেভ নিশ্চিত করা হচ্ছে...');
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        setLocalRegistry(prev => prev.map(p => ({ ...p, status: 'synced' })));
+        setCloudSyncedCount(prev => prev + localRegistry.filter(p => p.status === 'pending').length);
+        setLastSync(new Date().toLocaleTimeString());
+        setIsSyncing(false);
+      }
+    }, 600);
   };
 
-  const simulateScribe = () => {
+  const processDictation = () => {
+    if (!scribeInput) return;
     setIsTranscribing(true);
-    setRecordedScript(
-      lang === 'en' 
-        ? "Maternal patient is Morzina Begum, 34 weeks, complaints of severe headache. BP measured at 145 over 95, patient mentions blur vision."
-        : "রোগীর নাম মোরজিনা বেগম, বয়স ৩৪ বছর। তার মাথায় তীব্র ব্যথা রয়েছে সাথে রক্তচাপ ১৪৫ বাই ৯৫ এবং চোখে ঝাপসা দেখার উপসর্গ।"
-    );
 
     setTimeout(() => {
       setIsTranscribing(false);
-      setScribeNotes(
-        lang === 'en' 
-          ? "Scribe Summary: Gestational maternal Morzina Begum displays elevated arterial BP (145/95 mmHg) accompanied by pre-eclampsia prodromal signs (cerebral headache, visual blurring). Clinical escalation to nearest NGO healthcare hub suggested."
-          : "স্ক্রাইব সারাংশ: রোগী মোরজিনা বেগম গর্ভকালীন উচ্চ রক্তচাপে (১৪৫/৯৫) ভুগছেন। তীব্র মাথা ব্যথা ও চোখে ঝাপসা দেখা এক্লাম্পসিয়া সিগন্যাল নির্দেশ করে। দ্রুত বিশেষজ্ঞ চিকিৎসকের পরামর্শ নিন।"
-      );
-    }, 2500);
+      setScribeNotes({
+        soap: {
+          subjective: lang === 'en' ? "Patient reports severe symptoms matching the dictated input." : "রোগীর উল্লেখিত উপসর্গ অনুযায়ী তীব্র সমস্যা প্রতীয়মান হচ্ছে।",
+          objective: lang === 'en' ? "Vitals pending validation. Patient appears distressed in recording." : "প্রাথমিক ভাইটালস যাচাই করা প্রয়োজন। রোগী রেকর্ডিংয়ে ব্যথাতুর।",
+          assessment: lang === 'en' ? "Suspected acute condition requiring immediate physician review." : "সম্ভাব্য জটিল অবস্থা যা চিকিৎসকের পর্যালোচনা দাবি করে।",
+          plan: lang === 'en' ? "1. Triage to ICU\n2. Order comprehensive metabolic panel" : "১. আইসিইউতে স্থানান্তর\n২. মেটাবলিক প্যানেল পরীক্ষা"
+        },
+        triagePriority: scribeInput.toLowerCase().includes('emergency') || scribeInput.toLowerCase().includes('severe') ? 'RED (Emergency)' : 'YELLOW (Urgent)',
+        clinicalTerms: [
+          { term: lang === 'en' ? 'Hypertension' : 'উচ্চ রক্তচাপ', confidence: 95 },
+          { term: lang === 'en' ? 'Pre-eclampsia' : 'এক্লাম্পসিয়া', confidence: 88 }
+        ]
+      });
+    }, 2000);
   };
 
   return (
@@ -155,6 +204,43 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
                   />
                 </div>
                 <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "Village / Area" : "গ্রাম / এলাকা"}</label>
+                  <input
+                    id="worker-village"
+                    type="text"
+                    value={village}
+                    onChange={(e) => setVillage(e.target.value)}
+                    className="w-full p-2 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "Clinical Priority" : "অগ্রাধিকার"}</label>
+                  <select
+                    id="worker-priority"
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-white"
+                  >
+                    <option value="High">{lang === 'en' ? "High" : "উচ্চ"}</option>
+                    <option value="Medium">{lang === 'en' ? "Medium" : "মাঝারি"}</option>
+                    <option value="Low">{lang === 'en' ? "Low" : "নিম্ন"}</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "Hb Level (g/dL)" : "হিমোগ্লোবিন লেভেল"}</label>
+                  <input
+                    id="worker-hb"
+                    type="number"
+                    step="0.1"
+                    value={hemoglobin}
+                    onChange={(e) => setHemoglobin(e.target.value)}
+                    className="w-full p-2 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "BP Systolic" : "সিস্টোলিক রক্তচাপ"}</label>
                   <input
                     id="worker-sys"
@@ -175,13 +261,12 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "Hb Level (g/dL)" : "হিমোগ্লোবিন লেভেল"}</label>
+                  <label className="text-[11px] font-semibold text-slate-500">{lang === 'en' ? "Chief Symptoms" : "প্রধান উপসর্গ"}</label>
                   <input
-                    id="worker-hb"
-                    type="number"
-                    step="0.1"
-                    value={hemoglobin}
-                    onChange={(e) => setHemoglobin(e.target.value)}
+                    id="worker-symptoms"
+                    type="text"
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
                     className="w-full p-2 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white"
                   />
                 </div>
@@ -241,24 +326,42 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
                 <Database className="w-4 h-4 text-emerald-500" />
                 {lang === 'en' ? "Edge Sync Sync Queue" : "অফলাইন বাফার রেজিস্ট্রি"}
               </h3>
-              <button
-                id="worker-sync-all-btn"
-                onClick={handleCloudSync}
-                disabled={isSyncing}
-                className="p-1 px-2.5 rounded bg-purple-600 text-[10px] font-bold tracking-wider text-white uppercase hover:bg-purple-500 disabled:opacity-50 flex items-center gap-1 shrink-0"
-              >
-                {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                {t.syncNow}
-              </button>
+              <div className="flex items-center gap-4">
+                 <div className="text-[10px] font-mono text-slate-500 text-right">
+                   <div>Pending: <span className="font-bold text-amber-500">{localRegistry.filter(p => p.status === 'pending').length}</span></div>
+                   <div>Last sync: <span className="text-slate-400">{lastSync}</span></div>
+                 </div>
+                 <button
+                   id="worker-sync-all-btn"
+                   onClick={handleCloudSync}
+                   disabled={isSyncing || localRegistry.filter(p => p.status === 'pending').length === 0}
+                   className="p-1.5 px-3 rounded-lg bg-purple-600 text-[11px] font-bold tracking-wider text-white uppercase hover:bg-purple-500 disabled:opacity-50 flex items-center gap-1.5 shrink-0 transition-all"
+                 >
+                   {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                   {t.syncNow}
+                 </button>
+              </div>
             </div>
 
             {/* Offline cached cases list */}
             <div className="space-y-3">
               <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 pb-1 border-b border-slate-100 dark:border-slate-800">
-                <span>PATIENT RECORD</span>
+                <span>CLINICAL DATABASE TABLE</span>
                 <span>STATUS</span>
               </div>
               
+              {isSyncing && (
+                <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl space-y-2">
+                  <div className="flex justify-between text-xs font-bold font-mono text-purple-600 dark:text-purple-400">
+                    <span>{syncStage}</span>
+                    <span>{syncProgress}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                     <div className="h-full bg-purple-500 transition-all duration-300" style={{ width: `${syncProgress}%` }}></div>
+                  </div>
+                </div>
+              )}
+
               <div className="max-h-52 overflow-y-auto space-y-2.5 pr-1">
                 {localRegistry.length === 0 ? (
                   <p className="text-xs text-center text-slate-400 py-4 italic">
@@ -266,16 +369,20 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
                   </p>
                 ) : (
                   localRegistry.map((p) => (
-                    <div key={p.id} className="p-3 bg-slate-500/5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-                      <div>
-                        <p className="font-bold text-slate-800 dark:text-white">{p.name} ({p.age}y / {p.gender})</p>
-                        <p className="text-[10px] font-mono text-slate-400">BP: {p.bp} | Sugar: {p.bloodSugar}mmol/L</p>
-                        {p.maternalRisk && <p className="text-[9px] font-medium text-pink-500">{p.maternalRisk}</p>}
+                    <div key={p.id} className="p-3 bg-slate-500/5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs transition-opacity hover:bg-slate-500/10">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                           <p className="font-bold text-slate-800 dark:text-white uppercase">{p.id}</p>
+                           <span className={`px-1.5 py-[1px] rounded text-[8px] font-bold uppercase ${p.priority === 'High' ? 'bg-red-500/10 text-red-500' : p.priority === 'Medium' ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500'}`}>{p.priority} PRIORITY</span>
+                        </div>
+                        <p className="font-semibold text-slate-700 dark:text-slate-300 mt-0.5">{p.name} <span className="font-normal text-slate-500">· {p.age}y · {p.gender} · {p.village}</span></p>
+                        <p className="text-[10px] font-mono text-slate-500 mt-1">Symptoms: {p.symptoms}</p>
+                        <p className="text-[10px] font-mono text-slate-400">BP: {p.bp} | Sugar: {p.bloodSugar} | TS: {p.timestamp}</p>
                       </div>
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold font-mono tracking-wider ${
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono tracking-wider ml-3 ${
                         p.status === 'synced' 
                           ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
-                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                       }`}>
                         {p.status === 'synced' ? 'SYNCED' : 'PENDING'}
                       </span>
@@ -298,38 +405,69 @@ export default function HealthWorkerHub({ lang }: HealthWorkerHubProps) {
                 : "ডাক্তারের মুখের ডিক্টেশন বিশ্লেষণ করে মেমোরি কার্ডে সেভ করার প্রযুক্তিগত ট্রায়াল নিন।"}
             </p>
 
-            <button
-              id="worker-sim-scribe-btn"
-              onClick={simulateScribe}
-              className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-              {lang === 'en' ? "Simulate Clinical Discussion Tape" : "রেকর্ডিং ট্রান্সক্রাইব করুন"}
-            </button>
-
-            {recordedScript && (
-              <div className="space-y-3 pt-2 text-xs">
-                <div className="p-3 bg-purple-500/5 rounded-xl border border-purple-500/10">
-                  <p className="text-[10px] font-bold font-mono uppercase text-slate-400 mb-1">
-                    {lang === 'en' ? "Captured Auditory Input" : "প্রাপ্ত ভয়েস ইনপুট"}
-                  </p>
-                  <p className="italic text-slate-700 dark:text-slate-300">{recordedScript}</p>
-                </div>
-                
-                {isTranscribing ? (
-                  <div className="flex justify-center py-2">
-                    <RefreshCw className="w-5 h-5 text-purple-500 animate-spin" />
+            <div className="bg-slate-500/5 rounded-xl border border-slate-200 dark:border-slate-800 p-2 space-y-2">
+               <textarea 
+                  value={scribeInput}
+                  onChange={(e) => setScribeInput(e.target.value)}
+                  placeholder={lang === 'en' ? "Type or narrate clinical observations here..." : "ক্লিনিকাল পর্যবেক্ষণ এখানে লিখুন..."}
+                  className="w-full bg-transparent border-none focus:ring-0 text-sm text-slate-800 dark:text-white min-h-[60px] resize-none"
+               />
+               <div className="flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-2">
+                  <div className="flex gap-2">
+                     <button className="p-2 rounded-full bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all">
+                        <MessageSquare className="w-4 h-4" />
+                     </button>
                   </div>
-                ) : (
-                  scribeNotes && (
-                    <div className="p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                      <p className="text-[10px] font-bold font-mono uppercase text-slate-400 mb-1">
-                        {lang === 'en' ? "Structured Diagnostic Log" : "অটো-ফিল্ড ক্লিনিকাল রিপোর্ট"}
-                      </p>
-                      <p className="leading-relaxed text-slate-700 dark:text-slate-200">{scribeNotes}</p>
+                  <button
+                    onClick={processDictation}
+                    disabled={isTranscribing || !scribeInput.trim()}
+                    className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isTranscribing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    {lang === 'en' ? "Process EMR" : "রিপোর্ট তৈরি করুন"}
+                  </button>
+               </div>
+            </div>
+
+            {scribeNotes && !isTranscribing && (
+              <div className="space-y-4 pt-2">
+                 <div className="p-4 bg-purple-500/5 rounded-xl border border-purple-500/10 space-y-3">
+                    <div className="flex justify-between items-center pb-2 border-b border-purple-500/10">
+                       <h5 className="font-bold text-slate-800 dark:text-white text-xs">{lang === 'en' ? "AI Clinical Summary Card" : "এআই ক্লিনিকাল সারাংশ"}</h5>
+                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${scribeNotes.triagePriority.includes('RED') ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{scribeNotes.triagePriority}</span>
                     </div>
-                  )
-                )}
+                    
+                    <div className="space-y-2 text-[11px]">
+                       <div>
+                          <strong className="text-purple-600 dark:text-purple-400">Subjective:</strong>
+                          <p className="text-slate-600 dark:text-slate-300">{scribeNotes.soap.subjective}</p>
+                       </div>
+                       <div>
+                          <strong className="text-purple-600 dark:text-purple-400">Objective:</strong>
+                          <p className="text-slate-600 dark:text-slate-300">{scribeNotes.soap.objective}</p>
+                       </div>
+                       <div>
+                          <strong className="text-purple-600 dark:text-purple-400">Assessment:</strong>
+                          <p className="text-slate-600 dark:text-slate-300">{scribeNotes.soap.assessment}</p>
+                       </div>
+                       <div>
+                          <strong className="text-purple-600 dark:text-purple-400">Action Plan & Prescription:</strong>
+                          <pre className="text-emerald-600 dark:text-emerald-400 font-mono mt-1 whitespace-pre-wrap leading-relaxed">{scribeNotes.soap.plan}</pre>
+                       </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-purple-500/10">
+                       <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Extracted Medical Terminology</p>
+                       <div className="flex gap-2 flex-wrap">
+                          {scribeNotes.clinicalTerms.map((t: any, i: number) => (
+                             <div key={i} className="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-[10px]">
+                                <span className="font-medium text-slate-700 dark:text-slate-300">{t.term}</span>
+                                <span className="text-emerald-500 font-mono">{t.confidence}%</span>
+                             </div>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
               </div>
             )}
           </div>
