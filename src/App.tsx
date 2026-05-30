@@ -95,7 +95,7 @@ export default function App() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
+    <div className={`min-h-screen w-full flex-1 transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
       
       {/* Decorative ambient glowing beams inspired by the Proxima and Cawar mockups */}
       <div className="absolute top-0 left-0 right-0 h-[800px] pointer-events-none overflow-hidden select-none z-0">
@@ -358,7 +358,7 @@ export default function App() {
         </div>
 
         {/* Global Medical Disclaimer Banner footer */}
-        <footer className="relative border-t border-slate-200/50 dark:border-[#484082]/20 bg-white dark:bg-[#100C20] pt-16 pb-24 lg:pb-12 w-full px-6 sm:px-10 lg:px-16 mt-auto overflow-hidden">
+        <footer className="relative border-t border-slate-200/50 dark:border-[#484082]/20 bg-white dark:bg-[#100C20] pt-16 pb-40 lg:pb-16 w-full px-6 sm:px-10 lg:px-16 mt-auto flex-shrink-0">
           {/* Subtle background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#6A74FF]/5 blur-[120px] rounded-full pointer-events-none" />
 
