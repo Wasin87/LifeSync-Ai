@@ -143,16 +143,16 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
               )}
 
               <div className="flex flex-row flex-nowrap w-full justify-between items-center relative z-20 px-0.5 sm:px-0 gap-1 sm:gap-4">
-                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <PhoneIcon className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
+                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <PhoneIcon className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
                     <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Rural Node</span>
                  </div>
-                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all z-20 flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Network className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
+                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all z-20 flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Network className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
                     <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">HL7 Engine</span>
                  </div>
-                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Landmark className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
+                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Landmark className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
                     <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Govt DB</span>
                  </div>
               </div>

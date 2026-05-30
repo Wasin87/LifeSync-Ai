@@ -187,46 +187,46 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
              <div className="flex flex-row flex-nowrap w-full items-center justify-between relative px-0.5 sm:px-4 gap-0.5 sm:gap-2">
                 
                 {/* Horizontal progress background connector line */}
-                <div className="absolute left-[10%] right-[10%] h-0.5 bg-slate-200 dark:bg-slate-800 -z-10 top-[18px] sm:top-8 transform -translate-y-1/2" />
+                <div className="absolute left-[10%] right-[10%] h-0.5 bg-slate-200 dark:bg-slate-800 -z-10 top-[14px] sm:top-8 transform -translate-y-1/2" />
                 
                 {/* 1. Patient */}
                 <div className="flex flex-col items-center flex-1 min-w-0">
-                   <div className={`w-8 h-8 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 1 ? 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-sm'}`}>
-                      <User className={`w-4 h-4 sm:w-8 sm:h-8 ${demoStep >= 1 ? 'text-white' : 'text-slate-400'}`} />
+                   <div className={`w-7 h-7 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 1 ? 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-sm'}`}>
+                      <User className={`w-3.5 h-3.5 sm:w-8 sm:h-8 ${demoStep >= 1 ? 'text-white' : 'text-slate-400'}`} />
                    </div>
-                   <span className={`mt-1.5 text-[6.5px] xs:text-[8px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 1 ? 'text-purple-600 dark:text-purple-400 font-extrabold' : 'text-slate-500'}`}>Patient</span>
+                   <span className={`mt-1.5 text-[7px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 1 ? 'text-purple-600 dark:text-purple-400 font-extrabold' : 'text-slate-500'}`}>Patient</span>
                 </div>
                 
                 {/* 2. GSM Network */}
                 <div className="flex flex-col items-center flex-1 min-w-0">
-                   <div className={`w-8 h-8 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 2 ? 'bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
-                      <Radio className={`w-4 h-4 sm:w-8 sm:h-8 ${demoStep >= 2 ? 'text-white animate-pulse' : 'text-slate-400'}`} />
+                   <div className={`w-7 h-7 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 2 ? 'bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
+                      <Radio className={`w-3.5 h-3.5 sm:w-8 sm:h-8 ${demoStep >= 2 ? 'text-white animate-pulse' : 'text-slate-400'}`} />
                    </div>
-                   <span className={`mt-1.5 text-[6.5px] xs:text-[8px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 2 ? 'text-cyan-600 dark:text-cyan-400 font-extrabold' : 'text-slate-500'}`}>USSD/SMS</span>
+                   <span className={`mt-1.5 text-[7px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 2 ? 'text-cyan-600 dark:text-cyan-400 font-extrabold' : 'text-slate-500'}`}>USSD/SMS</span>
                 </div>
  
                 {/* 3. Edge AI */}
                 <div className="flex flex-col items-center flex-1 min-w-0">
-                   <div className={`w-8 h-8 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 3 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
-                      <Cpu className={`w-4 h-4 sm:w-8 sm:h-8 ${demoStep >= 3 ? 'text-white' : 'text-slate-400'}`} />
+                   <div className={`w-7 h-7 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 3 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
+                      <Cpu className={`w-3.5 h-3.5 sm:w-8 sm:h-8 ${demoStep >= 3 ? 'text-white' : 'text-slate-400'}`} />
                    </div>
-                   <span className={`mt-1.5 text-[6.5px] xs:text-[8px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 3 ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-500'}`}>Edge AI</span>
+                   <span className={`mt-1.5 text-[7px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 3 ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-500'}`}>Edge AI</span>
                 </div>
  
                 {/* 4. Queue / DB */}
                 <div className="flex flex-col items-center flex-1 min-w-0">
-                   <div className={`w-8 h-8 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 4 ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
-                      <Database className={`w-4 h-4 sm:w-8 sm:h-8 ${demoStep >= 4 ? 'text-white' : 'text-slate-400'}`} />
+                   <div className={`w-7 h-7 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 4 ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
+                      <Database className={`w-3.5 h-3.5 sm:w-8 sm:h-8 ${demoStep >= 4 ? 'text-white' : 'text-slate-400'}`} />
                    </div>
-                   <span className={`mt-1.5 text-[6.5px] xs:text-[8px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 4 ? 'text-blue-600 dark:text-blue-400 font-extrabold' : 'text-slate-500'}`}>Queue</span>
+                   <span className={`mt-1.5 text-[7px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 4 ? 'text-blue-600 dark:text-blue-400 font-extrabold' : 'text-slate-500'}`}>Queue</span>
                 </div>
  
                 {/* 5. Health Worker / Hospital */}
                 <div className="flex flex-col items-center flex-1 min-w-0">
-                   <div className={`w-8 h-8 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 5 ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
-                      <ShieldAlert className={`w-4 h-4 sm:w-8 sm:h-8 ${demoStep >= 5 ? 'text-white' : 'text-slate-400'}`} />
+                   <div className={`w-7 h-7 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-500 z-10 shrink-0 ${demoStep >= 5 ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110' : 'bg-slate-100 dark:bg-slate-800 shadow-md'}`}>
+                      <ShieldAlert className={`w-3.5 h-3.5 sm:w-8 sm:h-8 ${demoStep >= 5 ? 'text-white' : 'text-slate-400'}`} />
                    </div>
-                   <span className={`mt-1.5 text-[6.5px] xs:text-[8px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 5 ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : 'text-slate-500'}`}>Sync Hosp</span>
+                   <span className={`mt-1.5 text-[7px] sm:text-xs font-bold text-center leading-tight truncate px-0.5 rounded sm:bg-white/80 sm:dark:bg-black/60 sm:py-0.5 ${demoStep >= 5 ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : 'text-slate-500'}`}>Sync Hosp</span>
                 </div>
  
              </div>
