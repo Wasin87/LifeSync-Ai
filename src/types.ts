@@ -56,8 +56,8 @@ export const BanglaTranslations = {
   settings: "সেটিংস",
 
   // Common UI
-  dashboardActive: "সক্রিয় ড্যাশবোর্ড",
-  offlineMode: "অoffline মোড",
+  dashboardActive: "সক্রিয় დ্যাশবোর্ড",
+  offlineMode: "অফলাইন মোড",
   onlineMode: "অনলাইন মোড",
   syncNow: "সিঙ্ক করুন",
   emergencyAlert: "জরুরি সতর্কতা!",
@@ -146,6 +146,9 @@ export const EnglishTranslations = {
   systemArchitecture: "System Pipeline Architecture",
   privacyConsent: "Patient Data Consent Safeguards",
 };
+
+export type TranslationKey = keyof typeof EnglishTranslations;
+
 
 export function getTranslation(lang: Language) {
   return lang === 'bn' ? BanglaTranslations : EnglishTranslations;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShieldAlert, Activity, Heart, MapPin, Phone, 
   RefreshCw, CheckCircle, Smartphone as PhoneIcon, Landmark, Info
@@ -51,15 +51,15 @@ export default function EmergencyAIView({ lang }: EmergencyAIViewProps) {
     <div className="space-y-8 animate-fade-in">
       
       {/* Alert Ribbon */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-xl shadow-red-500/20">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 font-black text-lg md:text-xl uppercase tracking-wider">
-            <ShieldAlert className="w-6 h-6 animate-ping shrink-0" />
-            <h2>{lang === 'en' ? "Disaster Evacuation Mode & SOS AI" : "জরুরি দুর্যোগ চিকিৎসা এবং এসওএস প্যানেল"}</h2>
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 md:p-8 rounded-3xl transition-all duration-500 ${sosActive ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_0_40px_rgba(239,68,68,0.5)] scale-[1.01]' : 'bg-gradient-to-r from-red-600/90 to-rose-600/90 shadow-xl'} text-white border border-red-500/30`}>
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center gap-3 font-black text-xl md:text-2xl uppercase tracking-widest">
+            <ShieldAlert className={`w-8 h-8 shrink-0 ${sosActive ? 'animate-ping' : ''}`} />
+            <h2>{lang === 'en' ? "Emergency Response Center" : "জরুরি মেডিকেল এসওএস প্যানেল"}</h2>
           </div>
-          <p className="text-xs text-red-100 max-w-xl">
+          <p className="text-sm text-red-50 max-w-2xl font-medium opacity-90 leading-relaxed">
             {lang === 'en' 
-              ? "Triggering immediate medical SOS broadcasts coordinates to nearest NGO responders via low-bandwidth emergency frequencies."
+              ? "Instantly dispatch NGO rescue assets, secure priority hospital routing, and transmit live biometric streams to on-route EMT teams."
               : "দুর্যোগকালীন সংকটে বা প্রসবকালীন গুরুতর জটিলতায় একটি ক্লিকে আপনার অবস্থান ট্র্যাক করে এনজিও রেসকিউ টিম ডেকে নিন।"}
           </p>
         </div>
@@ -67,13 +67,17 @@ export default function EmergencyAIView({ lang }: EmergencyAIViewProps) {
         <button
           id="sos-trigger-alert-btn"
           onClick={triggerSOSAlarm}
-          className={`px-6 py-3 rounded-xl font-black uppercase text-xs tracking-widest border-2 transition-all shrink-0 ${
+          className={`relative px-8 py-4 rounded-2xl font-black uppercase text-sm tracking-widest transition-all shrink-0 overflow-hidden group shadow-2xl ${
             sosActive 
-              ? 'bg-white text-red-600 border-white font-black animate-pulse' 
-              : 'bg-red-700 hover:bg-red-800 text-white border-red-500'
+              ? 'bg-white text-red-600 hover:scale-95' 
+              : 'bg-red-900 border-2 border-red-400/50 hover:bg-white hover:text-red-700 hover:scale-105'
           }`}
         >
-          {sosActive ? (lang === 'en' ? "STOP SOS ALARM" : "এসওএস এলার্ম বন্ধ করুন") : (lang === 'en' ? "TRIGGER MEDICAL SOS" : "জরুরি এসওএস এলার্ম দিন")}
+          {sosActive && <div className="absolute inset-0 bg-red-100 animate-pulse mix-blend-multiply pointer-events-none"></div>}
+          <div className="relative z-10 flex items-center gap-2">
+             {sosActive ? <CheckCircle className="w-5 h-5"/> : <ShieldAlert className="w-5 h-5" />}
+             {sosActive ? (lang === 'en' ? "TERMINATE ALARM" : "এসওএস এলার্ম বন্ধ করুন") : (lang === 'en' ? "ACTIVATE MEDICAL SOS" : "জরুরি এসওএস এলার্ম দিন")}
+          </div>
         </button>
       </div>
 
@@ -90,6 +94,30 @@ export default function EmergencyAIView({ lang }: EmergencyAIViewProps) {
               Smartwatch synced
             </span>
           </div>
+
+          <AnimatePresence mode="popLayout">
+            {sosActive && (
+               <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="overflow-hidden">
+                  <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                     <div className="flex flex-col items-center justify-center p-3 text-center">
+                        <MapPin className="w-6 h-6 text-red-500 animate-bounce mb-2" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Dispatch</span>
+                        <span className="text-xs font-bold text-red-600 dark:text-red-400">Ambulance NGO-04 on route</span>
+                     </div>
+                     <div className="flex flex-col items-center justify-center p-3 text-center border-y md:border-y-0 md:border-x border-red-500/10">
+                        <Activity className="w-6 h-6 text-red-500 animate-pulse mb-2" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Priority</span>
+                        <span className="text-xs font-black text-rose-600">LEVEL 1 CRITICAL</span>
+                     </div>
+                     <div className="flex flex-col items-center justify-center p-3 text-center">
+                        <Landmark className="w-6 h-6 text-red-500 mb-2" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">ETA To Care</span>
+                        <span className="text-xl font-black text-slate-800 dark:text-white">4.2 <span className="text-xs text-slate-400">MINS</span></span>
+                     </div>
+                  </div>
+               </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 text-center space-y-1">

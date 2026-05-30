@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, Apple, Salad, HelpCircle, Activity, 
   ChevronRight, ArrowRight, HeartPulse, CheckSquare, RefreshCw, Flame, DollarSign, Pill
@@ -43,25 +43,65 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
   const [scanResult, setScanResult] = useState<any>(null);
   const [activeGroup, setActiveGroup] = useState<keyof typeof DIET_TEMPLATES>('PREG');
 
+  const generateNutritionIntelligence = (input: string) => {
+    const raw = input.toLowerCase().trim();
+    
+    // Core dictionaries
+    const highProteinWords = ["egg", "dim", "ডিম", "chicken", "murgi", "মুরগি", "beef", "goru", "গরু", "fish", "mach", "মাছ", "lentil", "dal", "ডাল"];
+    const highCarbWords = ["rice", "vat", "ভাত", "ruti", "রুটি", "potato", "alu", "আলু", "banana", "kola", "কলা"];
+    const dairyWords = ["milk", "dudh", "দুধ", "doi", "দই"];
+    const greenWords = ["shak", "শাক", "spinach", "pui"];
+
+    let cals = 200, pro = 5, carb = 20, fat = 5, fib = 2, irn = 1, cal = 20, score = 70;
+    let rank = 'Good', cost = 'Moderate', warn = [];
+
+    // Intelligence generation based on matches
+    let matchedProtein = false, matchedCarb = false, matchedDairy = false, matchedGreen = false;
+
+    if (highProteinWords.some(w => raw.includes(w))) { matchedProtein = true; pro += 15; cals += 50; score += 10; irn += 2; }
+    if (highCarbWords.some(w => raw.includes(w))) { matchedCarb = true; carb += 25; cals += 100; fib += 1.5; }
+    if (dairyWords.some(w => raw.includes(w))) { matchedDairy = true; pro += 8; cal += 200; fat += 6; score += 10; }
+    if (greenWords.some(w => raw.includes(w))) { matchedGreen = true; fib += 5; irn += 4; cal += 40; score += 15; cost = 'Low'; }
+
+    // Synthesize outputs
+    if (score > 85) rank = 'Excellent';
+    else if (score < 60) rank = 'Average';
+
+    if (matchedCarb && !matchedProtein) warn.push(lang === 'en' ? "High Carbohydrate spike risk" : "রক্তে শর্করার পরিমাণ দ্রুত বাড়তে পারে");
+    if (!matchedGreen && !matchedDairy) warn.push(lang === 'en' ? "Low micronutrient density" : "ভিটামিন ও মিনারেল কম");
+    if (matchedProtein && matchedGreen) warn.push(lang === 'en' ? "Excellent Iron/Protein balance" : "পর্যাপ্ত আয়রন ও শক্তির সরবরাহ");
+
+    let summaryText = lang === 'en' 
+        ? `This food combination delivers approximately ${cals} kcal. ` 
+        : `এই খাবারে প্রায় ${cals} ক্যালরি আছে। `;
+
+    if (matchedProtein) summaryText += lang === 'en' ? "It is rich in protein, essential for tissue repair and growth. " : "এতে প্রচুর প্রোটিন রয়েছে যা শরীরের পেশী গঠনে সাহায্য করে। ";
+    if (matchedCarb) summaryText += lang === 'en' ? "The carbohydrate content will provide quick energy but should be portion controlled. " : "শর্করা থাকায় দ্রুত শক্তি পাবেন, তবে পরিমিত খাওয়া উচিত। ";
+    if (matchedGreen || matchedDairy) summaryText += lang === 'en' ? "Excellent source of essential minerals like Calcium and Iron. " : "এটি ক্যালসিয়াম এবং আয়রনের খুব ভালো একটি উৎস। ";
+    if (!matchedProtein && !matchedGreen) summaryText += lang === 'en' ? "Consider adding a protein or vegetable side to balance the meal." : "খাবারের পুষ্টি বাড়াতে এর সাথে সামান্য সবজি বা প্রোটিন যুক্ত করুন।";
+
+    return {
+      name: input,
+      calories: Math.min(cals, 800),
+      macros: { carb: Math.min(carb, 80), protein: Math.min(pro, 60), fat: Math.min(fat, 40) },
+      micros: { fiber: Math.min(fib, 15), iron: Math.min(irn, 10), calcium: Math.min(cal, 400) },
+      healthScore: Math.min(score, 99),
+      rating: rank,
+      riskIndicators: warn,
+      summary: summaryText,
+      budget: cost === 'Low' ? "Low Cost" : cost === 'Moderate' ? "Moderate Cost" : "High Cost",
+      recommendations: [lang === 'en' ? "Watch portion sizes" : "পরিমিত মাত্রায় গ্রহণ করুন", matchedGreen ? (lang === 'en' ? "Great vegetable intake" : "সবজির পরিমাণ চমৎকার") : (lang === 'en' ? "Add leafy greens" : "সবুজ শাক যুক্ত করুন")]
+    };
+  };
+
   const startFoodScan = () => {
     if (!foodInput.trim()) return;
     setIsScanning(true);
     setScanResult(null);
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult({
-        name: foodInput,
-        calories: 320,
-        macros: { carb: 45, protein: 12, fat: 8 },
-        micros: { fiber: 6.5, iron: 4.2, calcium: 150 },
-        healthScore: 84,
-        rating: 'Excellent',
-        riskIndicators: ['High Carb', 'Balanced Protein'],
-        summary: lang === 'en' ? "This combination provides slow-release carbohydrates beneficial for sustained energy, with an adequate micronutrient profile. Watch out for added sodium." : "এই খাবারে শর্করা এবং প্রোটিন ব্যালেন্সড অবস্থায় রয়েছে যা শরীরে দীর্ঘক্ষণ কাজ করার এনার্জি দেবে।",
-        budget: "Low ($0.40/meal)",
-        recommendations: [lang === 'en' ? "Add a side of leafy greens for iron" : "লৌহ পূরণে লাল শাক যোগ করুন", lang === 'en' ? "Avoid extra salt" : "বাড়তি লবণ পরিহার করুন"]
-      });
-    }, 2500);
+      setScanResult(generateNutritionIntelligence(foodInput));
+    }, 1800);
   };
 
   const diet = DIET_TEMPLATES[activeGroup];
@@ -226,11 +266,18 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
                    <p className="text-[10px] font-bold uppercase text-slate-500">Clinical Summary</p>
                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{scanResult.summary}</p>
                    <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                      {scanResult.recommendations.map((r: string, i: number) => (
-                         <div key={i} className="flex flex-1 items-start gap-1 p-2 bg-emerald-500/10 rounded-md text-[10px] text-emerald-700 dark:text-emerald-400">
-                            <Pill className="w-3 h-3 shrink-0 mt-0.5" /> <span>{r}</span>
-                         </div>
-                      ))}
+                     {scanResult.riskIndicators && scanResult.riskIndicators.map((w: string, i: number) => (
+                        <div key={`warn-${i}`} className="flex flex-1 items-start gap-1 p-2 bg-amber-500/10 rounded-md text-[10px] text-amber-700 dark:text-amber-400 mb-2">
+                           <Pill className="w-3 h-3 shrink-0 mt-0.5" /> <span>{w}</span>
+                        </div>
+                     ))}
+                     <div className="flex gap-2">
+                        {scanResult.recommendations.map((r: string, i: number) => (
+                           <div key={i} className="flex flex-1 items-start gap-1 p-2 bg-emerald-500/10 rounded-md text-[10px] text-emerald-700 dark:text-emerald-400">
+                              <Pill className="w-3 h-3 shrink-0 mt-0.5" /> <span>{r}</span>
+                           </div>
+                        ))}
+                     </div>
                    </div>
                 </div>
 

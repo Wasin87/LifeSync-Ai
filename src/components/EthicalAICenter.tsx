@@ -69,22 +69,22 @@ export default function EthicalAICenter({ lang }: EthicalAICenterProps) {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* GDPR/HIPAA compliance checklists (5-cols) */}
-        <div className="md:col-span-5 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4">
+        <div className="lg:col-span-4 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4 flex flex-col">
           <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2">
-            <FileCheck className="w-4.5 h-4.5 text-cyan-500" />
-            {lang === 'en' ? "Compliance Framework & Shields" : "তথ্য সুরক্ষা প্রোটোকল ও শিল্ড"}
+            <FileCheck className="w-5 h-5 text-cyan-500" />
+            {lang === 'en' ? "Privacy & Compliance Shield" : "তথ্য সুরক্ষা প্রোটোকল ও শিল্ড"}
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-3 flex-1 flex flex-col justify-center">
             {gdprChecks.map((check, idx) => (
-              <div key={idx} className="p-3 bg-slate-500/5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-mono">
+              <div key={idx} className="p-3 bg-slate-500/5 hover:bg-slate-500/10 transition-colors rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-mono shadow-sm">
                 <div>
-                  <p className="font-bold text-slate-800 dark:text-white">{check.title}</p>
-                  <p className="text-[10px] text-slate-400 font-sans">Methodology: {check.value}</p>
+                  <p className="font-bold text-slate-800 dark:text-white uppercase text-[10px] tracking-wider">{check.title}</p>
+                  <p className="text-[9px] text-slate-400 font-sans mt-0.5">Standard: {check.value}</p>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[9px] font-bold rounded">
+                <span className="px-2 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[9px] font-black uppercase tracking-wider rounded-md">
                   {check.status}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default function EthicalAICenter({ lang }: EthicalAICenterProps) {
         </div>
 
         {/* Data Anonymization Pipeline diagram (7-cols) */}
-        <div className="md:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-5">
+        <div className="lg:col-span-8 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-6">
           <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2">
             <HeartHandshake className="w-4.5 h-4.5 text-purple-500" />
             {lang === 'en' ? "Demographic Parity & Bias Deviation Metrics" : "এলগরিদম ডেমোগ্রাফিক সমতা সূচক"}
@@ -105,17 +105,24 @@ export default function EthicalAICenter({ lang }: EthicalAICenterProps) {
               : "গ্রামাঞ্চল বনাম শহরাঞ্চল এবং পুরুষ বনাম নারী রোগীদের রোগ নির্ণয়ে এআই এর নির্ভুলতার কোনো তারতম্য বা বৈষম্য ঘটছে কিনা তা পর্যবেক্ষণ করা হয়:"}
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 text-center">
-              <p className="text-[10px] text-slate-400 font-sans uppercase">Demographic Disparity</p>
-              <p className="text-3xl font-black text-purple-600 dark:text-purple-300 pt-1">{(biasRate * 100).toFixed(1)}%</p>
-              <span className="text-[9px] font-mono text-emerald-500">Perfect Fair alignment (&lt;3%)</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-indigo-500"></div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Demographic Disparity</p>
+              <div className="flex items-center justify-center gap-2 pt-3">
+                 <p className="text-4xl font-black text-purple-600 dark:text-purple-400">{(biasRate * 100).toFixed(1)}%</p>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-500 mt-2 block bg-emerald-500/10 py-1 rounded mx-4">Optimal Fair alignment (&lt;3%)</span>
             </div>
             
-            <div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/10 text-center">
-              <p className="text-[10px] text-slate-400 font-sans uppercase">Escalation Override Count</p>
-              <p className="text-3xl font-black text-cyan-500 pt-1">0 Cases</p>
-              <span className="text-[9px] font-mono text-slate-400">Human supervision Active</span>
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Human Escalation Overrides</p>
+              <div className="flex items-center justify-center gap-2 pt-3">
+                 <p className="text-4xl font-black text-cyan-500">0</p>
+                 <span className="text-sm font-bold text-slate-500">Cases</span>
+              </div>
+              <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 mt-2 block bg-cyan-500/10 py-1 rounded mx-4">100% Autonomous Accuracy</span>
             </div>
           </div>
 

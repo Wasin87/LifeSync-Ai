@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   Terminal, ShieldAlert, Cpu, Database, Network, Key, 
-  RefreshCw, CheckCircle, Smartphone as PhoneIcon, Landmark, Info
+  RefreshCw, CheckCircle, Smartphone as PhoneIcon, Landmark, Info, Activity
 } from 'lucide-react';
 import { getTranslation, Language } from '../types.js';
 
@@ -38,70 +38,134 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
         "POST /fhir/MaternalEncounter - Structuring FHIR v4 Bundle",
         "PUT /fhir/Observation/LIPID-329 - TLS Encrypted",
         "GET /fhir/Patient/$everything - Extraction completed successfully",
-        "POST /api/sms-callback - GSM rural USSD packet queued"
+        "POST /api/sms-callback - GSM rural USSD packet queued",
+        "SYNC /fhir/Immunization - Blockchain hash verified",
+        "AUTH /oauth2/token - MOHFW Central Server access granted"
       ];
       const randomPath = paths[Math.floor(Math.random() * paths.length)];
-      setLogs(prev => [ `[${new Date().toLocaleTimeString()}] ${randomPath}`, ...prev ].slice(0, 8));
-    }, 4500);
+      setLogs(prev => [ `[${new Date().toLocaleTimeString()}] ${randomPath}`, ...prev ].slice(0, 15));
+    }, 2000);
 
     return () => clearInterval(timer);
   }, []);
 
   const triggerMockTransmission = () => {
     setIsTransmitting(true);
+    setLogs(prev => [ `[${new Date().toLocaleTimeString()}] INITIATING SECURE HANDSHAKE PIPELINE...`, ...prev ]);
     setTimeout(() => {
       setIsTransmitting(false);
-      setLogs(prev => [ `[${new Date().toLocaleTimeString()}] SECURE_HANDSHAKE: DMCH Endpoint authenticated in 12ms.`, ...prev ]);
-    }, 2500);
+      setLogs(prev => [ 
+         `[${new Date().toLocaleTimeString()}] SECURE_HANDSHAKE: DMCH Endpoint authenticated in 12ms.`, 
+         `[${new Date().toLocaleTimeString()}] 142 PATIENT RECORDS SYNCED VIA FHIR BUNDLE.`,
+         ...prev 
+      ]);
+    }, 3500);
   };
 
   return (
     <div className="space-y-8 animate-fade-in">
       
       {/* Simulation Grid Header */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Connection health stats */}
-        <div className="p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-5">
+        <div className="lg:col-span-5 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 flex flex-col justify-between space-y-6">
           <div className="flex justify-between items-center text-purple-600 dark:text-purple-400 font-bold">
-            <h3 className="text-xs uppercase font-mono tracking-widest flex items-center gap-2">
-              <Network className="w-4.5 h-4.5" />
-              {lang === 'en' ? "Central HL7 FHIR Router Stats" : "কেন্দ্রীয় এইচএল৭ এফএইচআইআর গেটওয়ে"}
+            <h3 className="text-sm uppercase font-mono tracking-widest flex items-center gap-2">
+              <Network className="w-5 h-5" />
+              {lang === 'en' ? "FHIR Command Center" : "কেন্দ্রীয় এফএইচআইআর গেটওয়ে"}
             </h3>
-            <span className="text-[10px] bg-purple-500/10 text-purple-600 px-2 rounded-full font-mono">
-              Interoperable Core
-            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-3.5 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center">
-              <p className="text-[10px] text-slate-400 font-mono">ENCRYPTION LEVEL</p>
-              <p className="text-md font-extrabold text-slate-800 dark:text-white pt-1">AES-GCM-256</p>
+            <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center shadow-inner">
+              <p className="text-[10px] text-slate-400 font-mono uppercase">Encryption Shield</p>
+              <p className="text-sm lg:text-md font-black text-slate-800 dark:text-white pt-2">AES-GCM-256</p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center">
-              <p className="text-[10px] text-slate-400 font-mono">HL7 PROTOCOL</p>
-              <p className="text-md font-extrabold text-slate-800 dark:text-white pt-1">FHIR v4.0.1</p>
+            <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center shadow-inner">
+              <p className="text-[10px] text-slate-400 font-mono uppercase">Health Standard</p>
+              <p className="text-sm lg:text-md font-black text-slate-800 dark:text-white pt-2">FHIR R4 / HL7v3</p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center">
-              <p className="text-[10px] text-slate-400 font-mono">TRANSACTION THROUGHPUT</p>
-              <p className="text-md font-extrabold text-purple-500 pt-1">{fhirStats.throughput}</p>
+            <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center shadow-inner relative overflow-hidden">
+              <div className="absolute inset-0 bg-purple-500/5 animate-pulse"></div>
+              <p className="text-[10px] text-slate-400 font-mono uppercase relative z-10">Data Throughput</p>
+              <div className="flex items-center justify-center gap-2 pt-2 relative z-10">
+                 <Activity className="w-4 h-4 text-purple-500 animate-bounce" />
+                 <p className="text-sm lg:text-md font-black text-purple-600 dark:text-purple-400">{fhirStats.throughput}</p>
+              </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center">
-              <p className="text-[10px] text-slate-400 font-mono">RESPONSE LATENCY</p>
-              <p className="text-md font-extrabold text-cyan-500 pt-1">{fhirStats.latency}</p>
+            <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-100 dark:border-slate-800 text-center shadow-inner">
+              <p className="text-[10px] text-slate-400 font-mono uppercase">Gateway Latency</p>
+              <p className="text-sm lg:text-md font-black text-cyan-600 dark:text-cyan-400 pt-2">{fhirStats.latency}</p>
             </div>
           </div>
 
           <button
             id="btn-transmit-sync"
             onClick={triggerMockTransmission}
-            className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow"
+            className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/25"
           >
-            {isTransmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
-            {lang === 'en' ? "Execute Handshake with DMCH Node" : "হাসপাতাল নোডের সাথে সিকিউর হ্যান্ডশেক"}
+            {isTransmitting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Database className="w-5 h-5" />}
+            {lang === 'en' ? "Execute API Handshake Payload" : "হাসপাতাল নোডের সাথে ডাটা সিকিউর সিঙ্ক"}
           </button>
         </div>
 
+        {/* Data Transmission Pipeline Animation */}
+        <div className="lg:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4 relative overflow-hidden flex flex-col justify-between">
+           <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2 relative z-10">
+              <RefreshCw className={`w-4.5 h-4.5 text-cyan-500 ${isTransmitting ? 'animate-spin' : ''}`} />
+              {lang === 'en' ? "Live Data Pipeline Stream" : "লাইভ ডাটা পাইপলাইন ট্রান্সমিশন"}
+           </h3>
+           
+           <div className="flex-1 flex items-center justify-center py-10 relative">
+              {/* Background connection track */}
+              <div className="absolute left-10 right-10 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+              
+              {/* Animated data packets */}
+              {isTransmitting && (
+                 <>
+                   <motion.div 
+                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                     className="absolute w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] z-10" 
+                   />
+                   <motion.div 
+                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', delay: 0.4 }}
+                     className="absolute w-3 h-3 rounded-full bg-purple-400 shadow-[0_0_15px_#c084fc] z-10" 
+                   />
+                   <motion.div 
+                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear', delay: 0.8 }}
+                     className="absolute w-3 h-3 rounded-full bg-indigo-400 shadow-[0_0_15px_#818cf8] z-10" 
+                   />
+                 </>
+              )}
+
+              <div className="flex w-full justify-between relative z-20">
+                 <div className={`p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-2 transition-all ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <PhoneIcon className={`w-8 h-8 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
+                    <span className="text-[10px] font-bold uppercase text-slate-500">Rural Node</span>
+                 </div>
+                 <div className={`p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-2 transition-all z-20 ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Network className={`w-8 h-8 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
+                    <span className="text-[10px] font-bold uppercase text-slate-500">HL7 Engine</span>
+                 </div>
+                 <div className={`p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-2 transition-all ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Landmark className={`w-8 h-8 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
+                    <span className="text-[10px] font-bold uppercase text-slate-500">Govt DB</span>
+                 </div>
+              </div>
+           </div>
+
+           <div className="p-3 bg-purple-500/5 rounded-xl border border-purple-500/10 text-xs font-mono text-purple-600 dark:text-purple-400 flex items-center justify-between z-10">
+              <span className="flex items-center gap-2"><Key className="w-4 h-4"/> Token: 0x8F9B2...A94</span>
+              <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Validated</span>
+           </div>
+        </div>
+
+      </div>
+
+      {/* Grid below */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
         {/* FHIR Schema Sandbox panel */}
         <div className="p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4">
           <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
