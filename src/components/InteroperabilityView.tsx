@@ -42,7 +42,7 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
         "SYNC /fhir/Immunization - Blockchain hash verified",
         "AUTH /oauth2/token - MOHFW Central Server access granted"
       ];
-      const randomPath = paths[Math.floor(Math.random() * paths.length)];
+      const randomPath = paths[paths.length - 1 - (Math.floor(Math.random() * paths.length) % paths.length)];
       setLogs(prev => [ `[${new Date().toLocaleTimeString()}] ${randomPath}`, ...prev ].slice(0, 15));
     }, 2000);
 
@@ -119,38 +119,41 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
            
            <div className="flex-1 flex items-center justify-center py-10 relative">
               {/* Background connection track */}
-              <div className="absolute left-10 right-10 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+              <div className="absolute left-6 right-6 h-0.5 sm:h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full top-1/2 transform -translate-y-1/2"></div>
               
               {/* Animated data packets */}
               {isTransmitting && (
                  <>
                    <motion.div 
-                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                     className="absolute w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] z-10" 
+                     key="packet-1"
+                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] z-10 top-1/2 transform -translate-y-1/2" 
                    />
                    <motion.div 
-                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', delay: 0.4 }}
-                     className="absolute w-3 h-3 rounded-full bg-purple-400 shadow-[0_0_15px_#c084fc] z-10" 
+                     key="packet-2"
+                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', delay: 0.4 }}
+                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-purple-400 shadow-[0_0_15px_#c084fc] z-10 top-1/2 transform -translate-y-1/2" 
                    />
                    <motion.div 
-                     initial={{ left: '10%' }} animate={{ left: '90%' }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear', delay: 0.8 }}
-                     className="absolute w-3 h-3 rounded-full bg-indigo-400 shadow-[0_0_15px_#818cf8] z-10" 
+                     key="packet-3"
+                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear', delay: 0.8 }}
+                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-indigo-400 shadow-[0_0_15px_#818cf8] z-10 top-1/2 transform -translate-y-1/2" 
                    />
                  </>
               )}
 
-              <div className="flex w-full justify-between relative z-20 px-2 sm:px-0">
-                 <div className={`p-2 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-1 sm:gap-2 transition-all ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <PhoneIcon className={`w-5 h-5 sm:w-8 sm:h-8 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-500 whitespace-nowrap text-center">Rural Node</span>
+              <div className="flex flex-row flex-nowrap w-full justify-between items-center relative z-20 px-0.5 sm:px-0 gap-1 sm:gap-4">
+                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <PhoneIcon className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
+                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Rural Node</span>
                  </div>
-                 <div className={`p-2 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-1 sm:gap-2 transition-all z-20 ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Network className={`w-5 h-5 sm:w-8 sm:h-8 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-500 whitespace-nowrap text-center">HL7 Engine</span>
+                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all z-20 flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Network className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
+                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">HL7 Engine</span>
                  </div>
-                 <div className={`p-2 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center gap-1 sm:gap-2 transition-all ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Landmark className={`w-5 h-5 sm:w-8 sm:h-8 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-500 whitespace-nowrap text-center">Govt DB</span>
+                 <div className={`p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
+                    <Landmark className={`w-3.5 h-3.5 xs:w-5 xs:h-5 sm:w-8 sm:h-8 shrink-0 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
+                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Govt DB</span>
                  </div>
               </div>
            </div>

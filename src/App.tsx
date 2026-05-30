@@ -358,7 +358,7 @@ export default function App() {
         </div>
 
         {/* Global Medical Disclaimer Banner footer */}
-        <footer className="relative border-t border-slate-200/50 dark:border-[#484082]/20 bg-white dark:bg-[#100C20] pt-16 pb-40 lg:pb-16 w-full px-6 sm:px-10 lg:px-16 mt-auto flex-shrink-0">
+        <footer className="relative border-t border-slate-200/50 dark:border-[#484082]/20 bg-white dark:bg-[#100C20] pt-16 pb-56 sm:pb-60 md:pb-64 lg:pb-24 xl:pb-20 w-full px-6 sm:px-10 lg:px-16 mt-auto flex-shrink-0 overflow-visible">
           {/* Subtle background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#6A74FF]/5 blur-[120px] rounded-full pointer-events-none" />
 

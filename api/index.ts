@@ -205,6 +205,81 @@ app.post("/api/chat", async (req, res) => {
   return res.json(fallback);
 });
 
+app.post("/api/nutrition", async (req, res) => {
+  const { food, language = 'en' } = req.body;
+  const ai = getGemini();
+  if (ai) {
+    try {
+      const systemInstruction = 
+        `You are a clinical nutrition analysis AI. 
+        Analyze the submitted food item: "${food}".
+        You must return a raw JSON object aligned exactly with the schema provided.
+        Ensure no extra remarks, markdown coding brackets (like \`\`\`json), or text outside the JSON string.
+        Provide all textual fields in the requested language: ${language === 'bn' ? 'Bangla' : 'English'}.
+        Ensure numeric metrics representing real, realistic nutrition database standards per 100g or per standard serving size.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: `Analyze the nutrition of: ${food}. Return structured JSON.`,
+        config: {
+          systemInstruction,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              calories: { type: Type.NUMBER },
+              macros: {
+                type: Type.OBJECT,
+                properties: {
+                  carb: { type: Type.NUMBER },
+                  protein: { type: Type.NUMBER },
+                  fat: { type: Type.NUMBER }
+                },
+                required: ["carb", "protein", "fat"]
+              },
+              micros: {
+                type: Type.OBJECT,
+                properties: {
+                  fiber: { type: Type.NUMBER },
+                  iron: { type: Type.NUMBER },
+                  calcium: { type: Type.NUMBER },
+                  potassium: { type: Type.NUMBER }
+                },
+                required: ["fiber", "iron", "calcium", "potassium"]
+              },
+              healthScore: { type: Type.NUMBER },
+              rating: { type: Type.STRING },
+              budget: { type: Type.STRING },
+              overview: { type: Type.STRING },
+              benefits: { type: Type.ARRAY, items: { type: Type.STRING } },
+              concerns: { type: Type.ARRAY, items: { type: Type.STRING } },
+              consumers: { type: Type.ARRAY, items: { type: Type.STRING } },
+              clinicalSummary: { type: Type.STRING },
+              riskIndicators: { type: Type.ARRAY, items: { type: Type.STRING } },
+              recommendations: { type: Type.ARRAY, items: { type: Type.STRING } }
+            },
+            required: [
+              "name", "calories", "macros", "micros", "healthScore", "rating",
+              "budget", "overview", "benefits", "concerns", "consumers", "clinicalSummary",
+              "recommendations", "riskIndicators"
+            ]
+          }
+        }
+      });
+
+      const responseText = response.text?.trim() || "";
+      if (responseText) {
+        const parsed = JSON.parse(responseText);
+        return res.json(parsed);
+      }
+    } catch (e) {
+      console.error("Gemini nutrition call failed, falling back to local EMR DB: ", e);
+    }
+  }
+  return res.json({ fallback: true });
+});
+
 app.get("/api/sync", (req, res) => {
   res.json({ registry: patientRegistry, pending: syncQueue });
 });
