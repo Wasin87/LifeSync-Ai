@@ -95,17 +95,17 @@ export default function App() {
   ];
 
   return (
-    <div className={`h-screen overflow-hidden transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
+    <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
       
       {/* Decorative ambient glowing beams inspired by the Proxima and Cawar mockups */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+      <div className="absolute top-0 left-0 right-0 h-[800px] pointer-events-none overflow-hidden select-none z-0">
         <div className="absolute -top-[150px] left-[15%] w-[130%] h-[400px] bg-gradient-to-r from-purple-500/0 via-purple-500/15 to-purple-500/0 rotate-[-12deg] blur-3xl beam-sweep pointer-events-none"></div>
         <div className="absolute top-[40px] left-[35%] w-[120px] h-[350px] bg-purple-500/8 dark:bg-purple-600/15 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
         <div className="absolute bottom-[20px] right-[10%] w-[250px] h-[250px] bg-indigo-500/5 dark:bg-purple-800/8 rounded-full blur-[120px] pointer-events-none"></div>
       </div>
 
       {/* 2. Left side persistent Sidebar */}
-      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass-card-light dark:glass-card-dark border-r border-slate-200/60 dark:border-purple-950/40 h-full overflow-y-auto p-5 z-20 relative">
+      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass-card-light dark:glass-card-dark border-r border-slate-200/60 dark:border-purple-950/40 h-screen sticky top-0 overflow-y-auto p-5 z-20">
         
         {/* Logo and Brand Identity */}
         <div className="select-none pb-4 border-b border-slate-100 dark:border-purple-950/40">
@@ -159,7 +159,7 @@ export default function App() {
       </aside>
 
       {/* 2. Main content compartment */}
-      <main className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden flex flex-col relative z-10">
+      <main className="flex-1 min-w-0 flex flex-col relative z-10 min-h-screen">
         
         {/* Dynamic Navigation Topbar */}
         <header className="p-4 px-6 glass-card-light dark:glass-card-dark border-b border-slate-200/60 dark:border-slate-850/80 flex items-center justify-between gap-4 sticky top-0 z-30 backdrop-blur-md shadow-sm">
