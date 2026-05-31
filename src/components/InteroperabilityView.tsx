@@ -111,60 +111,114 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
         </div>
 
         {/* Data Transmission Pipeline Animation */}
-        <div className="lg:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4 relative overflow-hidden flex flex-col justify-between">
+        <div id="data-pipeline-stream-card" className="lg:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-4 relative overflow-hidden flex flex-col justify-between">
            <h3 className="font-bold text-slate-800 dark:text-white text-xs flex items-center gap-2 relative z-10">
               <RefreshCw className={`w-4.5 h-4.5 text-cyan-500 ${isTransmitting ? 'animate-spin' : ''}`} />
               {lang === 'en' ? "Live Data Pipeline Stream" : "লাইভ ডাটা পাইপলাইন ট্রান্সমিশন"}
            </h3>
            
-           <div className="flex-1 w-full overflow-x-auto py-10 relative scrollbar-none">
-              <div className="min-w-[460px] lg:min-w-0 w-full relative h-[140px] flex flex-col items-center justify-center">
+           <div className="flex-1 w-full overflow-hidden py-4 relative">
+              <div className="w-full relative h-[180px] flex items-center justify-center">
                  {/* Background connection track */}
-                 <div className="absolute left-6 right-6 h-0.5 sm:h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full top-[50%] transform -translate-y-1/2"></div>
+                 <div className="absolute left-8 right-8 h-1 bg-slate-205 dark:bg-slate-800 rounded-full top-[50%] transform -translate-y-1/2 overflow-hidden">
+                    {/* Animated pipeline glow moving forward */}
+                    {isTransmitting && (
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-purple-500 via-cyan-500 to-indigo-500 w-1/2 rounded-full"
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                      />
+                    )}
+                 </div>
               
               {/* Animated data packets */}
               {isTransmitting && (
                  <>
                    <motion.div 
                      key="packet-1"
-                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] z-10 top-1/2 transform -translate-y-1/2" 
+                     initial={{ left: '15%' }} animate={{ left: '85%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                     className="absolute w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] z-30 top-1/2 transform -translate-y-1/2" 
                    />
                    <motion.div 
                      key="packet-2"
-                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', delay: 0.4 }}
-                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-purple-400 shadow-[0_0_15px_#c084fc] z-10 top-1/2 transform -translate-y-1/2" 
+                     initial={{ left: '15%' }} animate={{ left: '85%' }} transition={{ duration: 1.8, repeat: Infinity, ease: 'linear', delay: 0.5 }}
+                     className="absolute w-3.5 h-3.5 rounded-full bg-purple-400 shadow-[0_0_15px_#c084fc] z-30 top-1/2 transform -translate-y-1/2" 
                    />
                    <motion.div 
                      key="packet-3"
-                     initial={{ left: '8%' }} animate={{ left: '92%' }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear', delay: 0.8 }}
-                     className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-indigo-400 shadow-[0_0_15px_#818cf8] z-10 top-1/2 transform -translate-y-1/2" 
+                     initial={{ left: '15%' }} animate={{ left: '85%' }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear', delay: 0.9 }}
+                     className="absolute w-3 h-3 rounded-full bg-indigo-400 shadow-[0_0_15px_#818cf8] z-30 top-1/2 transform -translate-y-1/2" 
                    />
                  </>
               )}
 
-              <div className="flex flex-row flex-nowrap w-full justify-between items-center relative z-20 px-0.5 sm:px-0 gap-1 sm:gap-4">
-                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <PhoneIcon className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-purple-500' : 'text-slate-500'}`} />
-                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Rural Node</span>
+              <div className="flex flex-row items-center justify-between w-full max-w-xl mx-auto relative z-20 px-2 gap-3 sm:gap-6">
+                 {/* Rural Node */}
+                 <div className={`aspect-square w-24 sm:w-32 md:w-36 rounded-2xl border bg-white/75 dark:bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center gap-1.5 sm:gap-3 transition-all duration-300 relative group overflow-hidden ${
+                   isTransmitting 
+                     ? 'border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.4)] ring-2 ring-purple-500/20 scale-105' 
+                     : 'border-slate-200 dark:border-slate-800/80 hover:border-purple-500 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] hover:bg-slate-500/5 hover:-translate-y-1'
+                 }`}>
+                    {/* Glowing background gradient dynamic layer */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex flex-col items-center text-center p-2">
+                      <div className="relative mb-1">
+                        {isTransmitting && (
+                          <span className="absolute -inset-1.5 rounded-full bg-purple-500/20 animate-ping" />
+                        )}
+                        <PhoneIcon className={`w-5 h-5 sm:w-8 sm:h-8 shrink-0 transition-transform group-hover:scale-110 ${isTransmitting ? 'text-purple-500 animate-pulse' : 'text-slate-405 dark:text-slate-500'}`} />
+                      </div>
+                      <span className="text-[8px] sm:text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider">Rural Node</span>
+                      <span className="text-[7px] sm:text-[9px] font-mono font-medium text-slate-400 uppercase mt-0.5 tracking-wider">Node 01</span>
+                    </div>
                  </div>
-                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all z-20 flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Network className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-cyan-500' : 'text-slate-500'}`} />
-                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">HL7 Engine</span>
+
+                 {/* HL7 Engine */}
+                 <div className={`aspect-square w-24 sm:w-32 md:w-36 rounded-2xl border bg-white/75 dark:bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center gap-1.5 sm:gap-3 transition-all duration-305 relative group overflow-hidden ${
+                   isTransmitting 
+                     ? 'border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.5)] ring-2 ring-cyan-500/20 scale-105 z-20' 
+                     : 'border-slate-200 dark:border-slate-800/80 hover:border-cyan-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.25)] hover:bg-slate-500/5 hover:-translate-y-1'
+                 }`}>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex flex-col items-center text-center p-2">
+                      <div className="relative mb-1">
+                        {isTransmitting && (
+                          <span className="absolute -inset-1.5 rounded-full bg-cyan-500/20 animate-ping" />
+                        )}
+                        <Network className={`w-5 h-5 sm:w-8 sm:h-8 shrink-0 transition-transform group-hover:rotate-12 ${isTransmitting ? 'text-cyan-500 animate-pulse' : 'text-slate-405 dark:text-slate-500'}`} />
+                      </div>
+                      <span className="text-[8px] sm:text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider">HL7 Engine</span>
+                      <span className="text-[7px] sm:text-[9px] font-mono font-medium text-slate-400 uppercase mt-0.5 tracking-wider">Active</span>
+                    </div>
                  </div>
-                 <div className={`p-1 xs:p-1.5 sm:p-4 rounded-xl border-2 bg-white dark:bg-black flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all flex-1 min-w-0 overflow-hidden ${isTransmitting ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-slate-200 dark:border-slate-800'}`}>
-                    <Landmark className={`w-3 h-3 xs:w-5 sm:w-8 shrink-0 ${isTransmitting ? 'text-indigo-500' : 'text-slate-500'}`} />
-                    <span className="text-[6.5px] xs:text-[8px] sm:text-[10px] font-black uppercase text-slate-500 truncate max-w-full text-center leading-normal">Govt DB</span>
+
+                 {/* Govt DB */}
+                 <div className={`aspect-square w-24 sm:w-32 md:w-36 rounded-2xl border bg-white/75 dark:bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center gap-1.5 sm:gap-3 transition-all duration-310 relative group overflow-hidden ${
+                   isTransmitting 
+                     ? 'border-indigo-500 shadow-[0_0_25px_rgba(99,102,241,0.4)] ring-2 ring-indigo-500/20 scale-105' 
+                     : 'border-slate-200 dark:border-slate-800/80 hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:bg-slate-500/5 hover:-translate-y-1'
+                 }`}>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex flex-col items-center text-center p-2">
+                      <div className="relative mb-1">
+                        {isTransmitting && (
+                          <span className="absolute -inset-1.5 rounded-full bg-indigo-500/20 animate-ping" />
+                        )}
+                        <Landmark className={`w-5 h-5 sm:w-8 sm:h-8 shrink-0 transition-transform group-hover:scale-110 ${isTransmitting ? 'text-indigo-500 animate-pulse' : 'text-slate-405 dark:text-slate-500'}`} />
+                      </div>
+                      <span className="text-[8px] sm:text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider">Govt DB</span>
+                      <span className="text-[7px] sm:text-[9px] font-mono font-medium text-slate-400 uppercase mt-0.5 tracking-wider">Central</span>
+                    </div>
                  </div>
               </div>
            </div>
         </div>
 
-           <div className="p-3 bg-purple-500/5 rounded-xl border border-purple-500/10 text-xs font-mono text-purple-600 dark:text-purple-400 flex items-center justify-between z-10">
-              <span className="flex items-center gap-2"><Key className="w-4 h-4"/> Token: 0x8F9B2...A94</span>
-              <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Validated</span>
-           </div>
+        <div className="p-3 bg-purple-500/5 rounded-xl border border-purple-500/10 text-xs font-mono text-purple-600 dark:text-purple-400 flex items-center justify-between z-10 relative">
+           <span className="flex items-center gap-2"><Key className="w-4 h-4"/> Token: 0x8F9B2...A94</span>
+           <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500"/> Validated</span>
         </div>
+      </div>
 
       </div>
 

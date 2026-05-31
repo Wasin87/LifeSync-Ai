@@ -250,3 +250,13 @@
 .dark .text-slate-400 { color: #cbd5e1 !important; }
 .dark .text-slate-350 { color: #e2e8f0 !important; }
 .dark .text-slate-300 { color: #f1f5f9 !important; }
+
+@keyframes drawPulse {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.draw-pulse-anim {
+  animation: drawPulse 3.5s linear infinite;
+}

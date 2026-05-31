@@ -85,13 +85,13 @@ export default function EmergencyAIView({ lang }: EmergencyAIViewProps) {
         
         {/* Cardiac telemetry widget (7-cols) */}
         <div className="md:col-span-7 p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-6">
-          <div className="flex justify-between items-center text-red-500 font-bold">
-            <h3 className="text-xs uppercase font-mono tracking-widest flex items-center gap-2">
+          <div className="flex justify-between items-center text-red-500">
+            <h3 className="text-xs uppercase font-mono tracking-widest flex items-center gap-2 font-bold select-none">
               <Activity className="w-5 h-5 animate-pulse" />
               {lang === 'en' ? "Integrated Cardiac Telemetry Stream" : "রিয়েল-টাইম হার্ট-রেট ও রক্ত সংবহন"}
             </h3>
-            <span className="text-[10px] bg-red-500/10 text-red-600 px-2.5 py-0.5 rounded-full font-mono">
-              Smartwatch synced
+            <span className="text-[10px] bg-red-500/10 text-red-600 px-2.5 py-0.5 rounded-full font-mono font-bold animate-pulse">
+              Smartwatch Active
             </span>
           </div>
 
@@ -107,44 +107,75 @@ export default function EmergencyAIView({ lang }: EmergencyAIViewProps) {
                      <div className="flex flex-col items-center justify-center p-3 text-center border-y md:border-y-0 md:border-x border-red-500/10">
                         <Activity className="w-6 h-6 text-red-500 animate-pulse mb-2" />
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Priority</span>
-                        <span className="text-xs font-black text-rose-600">LEVEL 1 CRITICAL</span>
+                        <span className="text-xs font-black text-rose-600 uppercase tracking-wider">LEVEL 1 CRITICAL</span>
                      </div>
                      <div className="flex flex-col items-center justify-center p-3 text-center">
                         <Landmark className="w-6 h-6 text-red-500 mb-2" />
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">ETA To Care</span>
-                        <span className="text-xl font-black text-slate-800 dark:text-white">4.2 <span className="text-xs text-slate-400">MINS</span></span>
+                        <span className="text-xl font-black text-slate-800 dark:text-white">4.2 <span className="text-xs font-bold text-red-500">MINS</span></span>
                      </div>
                   </div>
                </motion.div>
             )}
           </AnimatePresence>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 text-center space-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 rounded-xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/20 dark:border-red-500/10 text-center space-y-1 hover:border-red-500/40 transition-all duration-300">
               <Heart className="w-6 h-6 text-red-500 mx-auto animate-pulse" />
-              <p className="text-[10px] text-slate-400 font-mono">PULSE bpm</p>
-              <p className="text-3xl font-black text-slate-800 dark:text-white pt-1">{heartRate}</p>
+              <p className="text-[10px] text-slate-500 font-semibold tracking-wider font-mono uppercase">PULSE RATE</p>
+              <p className="text-4xl font-extrabold text-slate-800 dark:text-white pt-1 tracking-tight">{heartRate} <span className="text-xs font-mono font-medium text-red-500">BPM</span></p>
             </div>
-            <div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/10 text-center space-y-1">
+            <div className="p-4 rounded-xl bg-cyan-500/10 dark:bg-cyan-500/5 border border-cyan-500/20 dark:border-cyan-500/10 text-center space-y-1 hover:border-cyan-500/40 transition-all duration-300">
               <Activity className="w-6 h-6 text-cyan-500 mx-auto" />
-              <p className="text-[10px] text-slate-400 font-mono">SPO2 Oxygen %</p>
-              <p className="text-3xl font-black text-slate-800 dark:text-white pt-1">{spo2}%</p>
+              <p className="text-[10px] text-slate-500 font-semibold tracking-wider font-mono uppercase">SPO2 OXYGEN</p>
+              <p className="text-4xl font-extrabold text-slate-800 dark:text-white pt-1 tracking-tight">{spo2}%</p>
+            </div>
+            <div className="p-4 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/5 border border-emerald-500/20 dark:border-emerald-500/10 text-center space-y-1 hover:border-emerald-500/40 transition-all duration-300">
+              <CheckCircle className="w-6 h-6 text-emerald-500 mx-auto" />
+              <p className="text-[10px] text-slate-500 font-semibold tracking-wider font-mono uppercase">ECG STATUS</p>
+              <p className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 pt-2 tracking-wide uppercase">
+                {sosActive ? "SINUS TACHY" : "NORMAL SINUS"}
+              </p>
             </div>
           </div>
 
-          {/* SVG representation of standard cardiac pulse graph */}
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-850 h-28 flex items-center justify-center overflow-hidden">
-            <svg viewBox="0 0 400 100" className="w-full h-full text-red-500 stroke-2 overflow-visible">
-              <path
-                d="M 0 50 L 50 50 L 60 20 L 70 80 L 80 50 L 150 50 L 160 10 L 170 90 L 180 50 L 250 50 L 260 20 L 270 80 L 280 50 L 350 50 L 360 10 L 370 90 L 380 50 L 400 50"
-                fill="none"
-                stroke="currentColor"
-                strokeDasharray="400"
-                strokeDashoffset={sosActive ? "200" : "0"}
-                className="transition-all duration-1000"
-                style={{ animation: 'auraPulse 2s infinite linear' }}
-              />
-            </svg>
+          {/* SVG representation of standard cardiac pulse graph with oscilloscope grid lines & labels */}
+          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 relative overflow-hidden flex flex-col justify-between">
+            {/* Oscilloscope Grid background */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:16px_16px] opacity-25 pointer-events-none"></div>
+            
+            {/* Calibration Waveform Labels */}
+            <div className="flex justify-between items-center text-[9px] font-mono text-slate-500 relative z-10 mb-2">
+              <span className="font-semibold text-slate-400">Lead II (ECG-I)</span>
+              <span className="font-semibold text-slate-400">G: 1.0mV</span>
+              <span className="font-semibold text-slate-400">Freq: 1.2Hz</span>
+              <span className="font-semibold text-red-500 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> Live Transmission
+              </span>
+            </div>
+
+            <div className="h-28 flex items-center justify-center overflow-hidden relative z-10">
+              <svg viewBox="0 0 500 100" className="w-full h-full text-red-500 stroke-2 overflow-visible">
+                <path
+                  d="M 0 50 L 50 50 L 60 20 L 70 80 L 80 50 L 150 50 L 160 10 L 170 90 L 180 50 L 250 50 L 260 20 L 270 80 L 280 50 L 350 50 L 360 10 L 370 90 L 380 50 L 450 50 L 460 20 L 470 80 L 480 50 L 500 50"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeDasharray="1000"
+                  className="drop-shadow-[0_0_6px_rgba(240,82,82,0.8)]"
+                  style={{
+                    strokeDashoffset: 1000,
+                    animation: 'drawPulse 3.5s linear infinite'
+                  }}
+                />
+              </svg>
+            </div>
+            
+            <div className="flex justify-between items-center text-[9px] font-mono text-slate-500 relative z-10 mt-2">
+              <span className="font-semibold text-slate-400">Vitals Sync: 100%</span>
+              <span className="font-semibold text-slate-400">Response Speed: 5G/LTE</span>
+              <span className="font-semibold text-red-600 dark:text-red-400 font-bold uppercase tracking-wider">{sosActive ? "SOS Beacon Active" : "No Alerts Detected"}</span>
+            </div>
           </div>
         </div>
 
