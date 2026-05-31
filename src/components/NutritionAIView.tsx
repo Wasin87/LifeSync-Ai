@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, Apple, Salad, Activity, 
   CheckSquare, RefreshCw, Flame, DollarSign, Pill,
-  Heart, AlertTriangle, Users, BookOpen
+  Heart, AlertTriangle, Users, BookOpen,
+  Plus, Trash2, ClipboardList, Scale, TrendingUp
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { getTranslation, Language } from '../types.js';
 
 interface NutritionAIViewProps {
@@ -626,6 +627,238 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
   const [customServerResult, setCustomServerResult] = useState<any>(null);
   const [activeGroup, setActiveGroup] = useState<keyof typeof DIET_TEMPLATES>('PREG');
 
+  // Interactive Custom Meal Planner & Calorie Tracker State
+  const [selectedLogFood, setSelectedLogFood] = useState<string>('rice');
+  const [logGrams, setLogGrams] = useState<number>(100);
+  const [logProfile, setLogProfile] = useState<'ADULT' | 'PREG' | 'DIAB' | 'CKD' | 'HYPERTENSION'>('ADULT');
+  const [loggedItems, setLoggedItems] = useState<Array<{
+    id: string;
+    foodKey: string;
+    name: { en: string; bn: string };
+    grams: number;
+    calories: number;
+    carb: number;
+    protein: number;
+    fat: number;
+    fiber: number;
+    iron: number;
+    calcium: number;
+    potassium: number;
+  }>>([
+    {
+      id: 'init-1',
+      foodKey: 'rice',
+      name: { en: 'Boiled Rice', bn: 'লাল চালের ভাত' },
+      grams: 150,
+      calories: 195,
+      carb: 42.0,
+      protein: 4.1,
+      fat: 0.5,
+      fiber: 2.3,
+      iron: 1.2,
+      calcium: 15,
+      potassium: 53
+    },
+    {
+      id: 'init-2',
+      foodKey: 'egg',
+      name: { en: 'Boiled Chicken Egg', bn: 'সেদ্ধ মুরগির ডিম' },
+      grams: 50,
+      calories: 78,
+      carb: 0.6,
+      protein: 6.5,
+      fat: 5.5,
+      fiber: 0.0,
+      iron: 0.6,
+      calcium: 25,
+      potassium: 63
+    }
+  ]);
+
+  const handleAddLogItem = () => {
+    if (!selectedLogFood) return;
+    const dbItem = LOCAL_FOOD_DB[selectedLogFood as keyof typeof LOCAL_FOOD_DB];
+    if (!dbItem) return;
+
+    const factor = logGrams / 100;
+    const newItem = {
+      id: Math.random().toString(36).substring(2, 9),
+      foodKey: selectedLogFood,
+      name: { en: dbItem.name.en, bn: dbItem.name.bn },
+      grams: logGrams,
+      calories: Math.round(dbItem.calories * factor),
+      carb: parseFloat((dbItem.macros.carb * factor).toFixed(1)),
+      protein: parseFloat((dbItem.macros.protein * factor).toFixed(1)),
+      fat: parseFloat((dbItem.macros.fat * factor).toFixed(1)),
+      fiber: parseFloat((dbItem.micros.fiber * factor).toFixed(1)),
+      iron: parseFloat((dbItem.micros.iron * factor).toFixed(1)),
+      calcium: Math.round(dbItem.micros.calcium * factor),
+      potassium: Math.round(dbItem.micros.potassium * factor)
+    };
+
+    setLoggedItems(prev => [...prev, newItem]);
+  };
+
+  const handleRemoveLogItem = (id: string) => {
+    setLoggedItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const logTotals = loggedItems.reduce((acc, item) => {
+    acc.calories += item.calories;
+    acc.carb += item.carb;
+    acc.protein += item.protein;
+    acc.fat += item.fat;
+    acc.fiber += item.fiber;
+    acc.iron += item.iron;
+    acc.calcium += item.calcium;
+    acc.potassium += item.potassium;
+    return acc;
+  }, { calories: 0, carb: 0, protein: 0, fat: 0, fiber: 0, iron: 0, calcium: 0, potassium: 0 });
+
+  logTotals.carb = parseFloat(logTotals.carb.toFixed(1));
+  logTotals.protein = parseFloat(logTotals.protein.toFixed(1));
+  logTotals.fat = parseFloat(logTotals.fat.toFixed(1));
+  logTotals.fiber = parseFloat(logTotals.fiber.toFixed(1));
+  logTotals.iron = parseFloat(logTotals.iron.toFixed(1));
+
+  const PROFILE_TARGETS = {
+    ADULT: {
+      name: { en: 'Healthy Adult Balance', bn: 'স্বাভাবিক প্রাপ্তবয়স্ক' },
+      calories: 2000, carb: 250, protein: 60, fat: 65, fiber: 25, iron: 15, calcium: 1000, potassium: 3500
+    },
+    PREG: {
+      name: { en: 'Maternal Prenatal Tracker', bn: 'গর্ভবতী মা ও মাতৃত্বকালীন' },
+      calories: 2300, carb: 280, protein: 80, fat: 70, fiber: 28, iron: 27, calcium: 1200, potassium: 3500
+    },
+    DIAB: {
+      name: { en: 'Type-2 Diabetes Control', bn: 'টাইপ-২ ডায়াবেটিস নিয়ন্ত্রণ' },
+      calories: 1600, carb: 150, protein: 70, fat: 50, fiber: 30, iron: 15, calcium: 1000, potassium: 3000
+    },
+    CKD: {
+      name: { en: 'Chronic Kidney Safelist (CKD)', bn: 'ক্রনিক কিডনি রোগ (CKD)' },
+      calories: 1800, carb: 220, protein: 45, fat: 55, fiber: 20, iron: 12, calcium: 800, potassium: 1800
+    },
+    HYPERTENSION: {
+      name: { en: 'Hypertension Heart Care', bn: 'উচ্চ রক্তচাপ ও হার্ট কেয়ার' },
+      calories: 1900, carb: 230, protein: 65, fat: 55, fiber: 30, iron: 15, calcium: 1100, potassium: 4000
+    }
+  };
+
+  const activeTarget = PROFILE_TARGETS[logProfile];
+
+  const getLogClinicalSafetyReport = () => {
+    const alerts: Array<{ type: 'danger' | 'warning' | 'success' | 'info'; text: { en: string; bn: string } }> = [];
+
+    if (logTotals.calories > activeTarget.calories) {
+      alerts.push({
+        type: 'danger',
+        text: {
+          en: `Calorie Excess: Logged meals total ${logTotals.calories} kcal, exceeding target of ${activeTarget.calories} kcal. Reduce portions.`,
+          bn: `অতিরিক্ত ক্যালরি: প্রস্তুতকৃত খাবারে মোট ${logTotals.calories} কিলোক্যালরি রয়েছে, যা লক্ষমাত্রা ${activeTarget.calories} কিলোক্যালরির চেয়ে বেশি। অনুগ্রহ করে খাবারের পরিমাণ কমিয়ে সমন্বয় করুন।`
+        }
+      });
+    } else if (logTotals.calories > 0 && logTotals.calories < activeTarget.calories * 0.5) {
+      alerts.push({
+        type: 'info',
+        text: {
+          en: `Deficient Calorie Satiety: Current meals supply only ${logTotals.calories} kcal. Ensure adequate energy intake to prevent cell-repair exhaustion.`,
+          bn: `স্বল্প ক্যালরি মাত্রা: প্রস্তুতকৃত খাবার অত্যন্ত কম ক্যালরি সম্পন্ন (${logTotals.calories} কি.ক্যাল)। পেশী ক্ষয়া রোধ করতে আরও পুষ্টিকর পরিপূরক উপাদান যুক্ত করার প্রয়োজন হতে পারে।`
+        }
+      });
+    }
+
+    if (logProfile === 'CKD' && logTotals.protein > activeTarget.protein) {
+      alerts.push({
+        type: 'danger',
+        text: {
+          en: `Renal Clearance Warning: Protein total ${logTotals.protein}g exceeds renal-safe cap of ${activeTarget.protein}g. Highly filtered nitrogenous loads strain compromised kidneys.`,
+          bn: `কিডনি সতর্কতা: প্রোটিনের মোট পরিমাণ (${logTotals.protein} গ্রাম) কিডনি নিষ্কাশন লক্ষ্যমাত্রা ${activeTarget.protein} গ্রামের চেয়ে বেশি! কিডনির অতিরিক্ত চাপ কমাতে প্রোটিনসমৃদ্ধ উপাদান পরিমিত করুন।`
+        }
+      });
+    } else if (logProfile === 'PREG' && logTotals.protein < activeTarget.protein * 0.4) {
+      alerts.push({
+        type: 'warning',
+        text: {
+          en: `Maternal Protein Deficit: Current protein of ${logTotals.protein}g is low. A pregnant mother requires high lean amino values (target ${activeTarget.protein}g) for maternal-fetal cell synthesis.`,
+          bn: `মাতৃত্বকালীন কম প্রোটিন: বর্তমানে প্রোটিনের পরিমাণ মাত্র ${logTotals.protein} গ্রাম। ভ্রূণ ও প্লাসেন্টার পেশীকলা গঠনের জন্য দৈনিক লক্ষ্যমাত্রা ${activeTarget.protein} গ্রাম অর্জনের চেষ্টা করুন।`
+        }
+      });
+    }
+
+    if (logProfile === 'DIAB' && logTotals.carb > activeTarget.carb) {
+      alerts.push({
+        type: 'danger',
+        text: {
+          en: `Glycemic Load Warning: Total carbohydrate levels (${logTotals.carb}g) exceed diabetes targets. Limit high glycemic items like polished white rice.`,
+          bn: `ডায়াবেটিস শর্করা সতর্কতা: শর্করা উপাদান (${logTotals.carb} গ্রাম) ডায়াবেটিস সুগার নিয়ন্ত্রণের জন্য নির্ধারিত সীমা ${activeTarget.carb} গ্রাম ছাড়িয়ে গেছে। লাল চালের ভাত বা রুটি যুক্ত করার পরম পরামর্শ থাকবে।`
+        }
+      });
+    }
+
+    if (logProfile === 'CKD' && logTotals.potassium > activeTarget.potassium) {
+      alerts.push({
+        type: 'danger',
+        text: {
+          en: `Hyperkalemia Kidney Risk: Total Potassium of ${logTotals.potassium}mg exceeds the renal threshold of ${activeTarget.potassium}mg. Extreme potassium load risks cardiac arrhythmia in CKD candidates.`,
+          bn: `গুরুতর পটাশিয়াম রিস্ক: প্রস্তুত খাবারে পটাশিয়ামের মোট ঘনত্ব (${logTotals.potassium} মি.গ্রাম) কিডনি বিকল লক্ষ্যমাত্রা ${activeTarget.potassium} মি.গ্রাম এর চেয়ে বেশি! কলা বা অতিরিক্ত ডাল পরিহার বা লিসিং করে তরকারি রান্না করুন।`
+        }
+      });
+    } else if (logProfile === 'HYPERTENSION' && logTotals.potassium > 0 && logTotals.potassium < activeTarget.potassium * 0.5) {
+      alerts.push({
+        type: 'warning',
+        text: {
+          en: `Insufficient Electrolyte Shielding: High potassium lowers arterial blood pressure. Your logged items are low on potassium (${logTotals.potassium}mg). Pair with banana, local greens or organic lime.`,
+          bn: `রক্তচাপ প্রতিরোধী খনিজ অভাব: সুষম পটাশিয়াম রক্তনালী নমনীয় রেখে প্রেশার কমায়। প্রস্তুত খাবারে পটাশিয়াম কম (${logTotals.potassium} মি.গ্রাম)। কলা বা সবজি বাড়িয়ে প্রেশার নিয়ন্ত্রণের ঢাল শক্তিশালী করুন।`
+        }
+      });
+    }
+
+    if (logProfile === 'PREG' && logTotals.iron > 0 && logTotals.iron < 15) {
+      alerts.push({
+        type: 'warning',
+        text: {
+          en: `Prenatal Anemia Alert: Gestational maternal iron levels are low (${logTotals.iron}mg). Consider adding high folate lentil dal or local leafy greens (Lal Shak) with citrus water to optimize hemoglobin.`,
+          bn: `গর্ভকালীন রক্তস্বল্পতা সতর্কতা: খাবারে আয়রনের ঘনত্ব কম (${logTotals.iron} মি.গ্রাম)। গর্ভবতী মায়ের রক্তের হিমোগ্লোবিন বাড়াতে তালিকায় মসুর ডাল, দেশী মাছ বা লাল শাক বাড়ান এবং ভিটামিন সি (লেবু) পান করুন।`
+        }
+      });
+    }
+
+    if (alerts.length === 0 && loggedItems.length > 0) {
+      alerts.push({
+        type: 'success',
+        text: {
+          en: `Superb Dietary Integrity Observed: Logged meals are in great clinical alignment with your selected health profile. Maintain this balance!`,
+          bn: `দারুণ সুষম পুষ্টি বিন্যাস! প্রস্তুতকৃত খাবার তালিকাটি আপনার নির্বাচিত স্বাস্থ্য প্রোফাইলের পুষ্টিসীমার সাথে চমৎকারভাবে সামঞ্জস্যপূর্ণ। সদ্ব্যবহার বজায় রাখুন!`
+        }
+      });
+    }
+
+    return alerts;
+  };
+
+  const comparisonChartData = loggedItems.length > 0 ? [
+    {
+      name: lang === 'en' ? 'Carbs' : 'শর্করা',
+      Logged: logTotals.carb,
+      Target: activeTarget.carb
+    },
+    {
+      name: lang === 'en' ? 'Protein' : 'আমিষ',
+      Logged: logTotals.protein,
+      Target: activeTarget.protein
+    },
+    {
+      name: lang === 'en' ? 'Fat' : 'চর্বি',
+      Logged: logTotals.fat,
+      Target: activeTarget.fat
+    },
+    {
+      name: lang === 'en' ? 'Fiber' : 'আঁশ',
+      Logged: logTotals.fiber,
+      Target: activeTarget.fiber
+    }
+  ] : [];
+
   // Unified translation selector helper - matches on-the-fly when parent lang updates
   const getDisplayResult = () => {
     if (customServerResult) {
@@ -1188,6 +1421,275 @@ export default function NutritionAIView({ lang }: NutritionAIViewProps) {
                  </p>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* NEW: Interactive Daily NutriLog and Calorie Budget Planner */}
+      <div id="interactive-nutrilog-planner" className="p-6 rounded-2xl glass-card-light dark:glass-card-dark border border-purple-500/10 space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div>
+            <h3 className="font-bold text-slate-800 dark:text-white text-md flex items-center gap-2">
+              <ClipboardList className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              {lang === 'en' ? "Community Clinical NutriLog Generator" : "ক্লিনিকাল খাদ্য ও পুষ্টিলগ ক্যালকুলেটর"}
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {lang === 'en' 
+                ? "Manually assemble and measure dietary macros aligned against special clinical health thresholds."
+                : "গর্ভপাত, কিডনি ও ডায়াবেটিস রোগীদের নির্ধারিত সীমা অনুযায়ী খাবারের পুষ্টি উপাদান ও ক্যালরি পরিমাপ করুন।"}
+            </p>
+          </div>
+
+          {/* Clinical target profile selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0">
+              {lang === 'en' ? "Health Profile:" : "স্বাস্থ্য প্রোফাইল:"}
+            </label>
+            <select
+              value={logProfile}
+              onChange={(e) => setLogProfile(e.target.value as any)}
+              className="text-xs font-semibold p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-705 text-slate-707 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+            >
+              {Object.entries(PROFILE_TARGETS).map(([key, target]) => (
+                <option key={key} value={key}>
+                  {lang === 'en' ? target.name.en : target.name.bn}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Form and Log List (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Item Adder Form Row */}
+            <div className="p-4 bg-slate-500/5 rounded-xl border border-slate-150 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+              <div className="sm:col-span-5 space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <Salad className="w-3.5 h-3.5 text-purple-500" />
+                  {lang === 'en' ? "Choose Food Commodity" : "খাদ্য উপাদান নির্বাচন"}
+                </label>
+                <select
+                  value={selectedLogFood}
+                  onChange={(e) => setSelectedLogFood(e.target.value)}
+                  className="w-full text-xs p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold focus:outline-none focus:ring-1 focus:ring-purple-500 text-slate-800 dark:text-white"
+                >
+                  {Object.keys(LOCAL_FOOD_DB).map(key => {
+                    const item = LOCAL_FOOD_DB[key as keyof typeof LOCAL_FOOD_DB];
+                    return (
+                      <option key={key} value={key}>
+                        {lang === 'en' ? item.name.en : item.name.bn}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="sm:col-span-4 space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <Scale className="w-3.5 h-3.5 text-purple-500" />
+                  {lang === 'en' ? "Portion Quantity" : "পরিমাণ (গ্রাম)"}
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="10"
+                    max="1000"
+                    value={logGrams}
+                    onChange={(e) => setLogGrams(Math.max(10, parseInt(e.target.value) || 0))}
+                    className="w-full text-xs p-2 pr-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-purple-500 text-slate-800 dark:text-white"
+                  />
+                  <span className="absolute right-2.5 top-2 text-[10px] uppercase font-bold text-slate-400">g</span>
+                </div>
+              </div>
+
+              <div className="sm:col-span-3">
+                <button
+                  onClick={handleAddLogItem}
+                  className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 h-[36px]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {lang === 'en' ? "Add Item" : "যুক্ত করুন"}
+                </button>
+              </div>
+            </div>
+
+            {/* Embedded Logged Items Table/List */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <ClipboardList className="w-3.5 h-3.5 text-purple-500" />
+                {lang === 'en' ? "Active NutriLog Entries" : "বর্তমান খাবারের তালিকা ও ওজন"}
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-mono">
+                  {loggedItems.length}
+                </span>
+              </h4>
+
+              {loggedItems.length === 0 ? (
+                <div className="py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-center">
+                  <p className="text-xs text-slate-450 dark:text-slate-500">
+                    {lang === 'en' ? "No items logged yet. Choose food above and add." : "খাবার তালিকা খালি। ডায়েরিতে যুক্ত করতে উপরে সিলেক্ট করে এড করুন।"}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-slate-155 dark:border-slate-800/80 bg-slate-500/5">
+                  <table className="w-full text-left border-collapse min-w-[500px]">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-200/20 dark:bg-slate-800/40 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                        <th className="p-2.5 pl-3">{lang === 'en' ? "Food Item" : "খাদ্য ও উপাদান"}</th>
+                        <th className="p-2.5 text-center">{lang === 'en' ? "Amount" : "ওজন"}</th>
+                        <th className="p-2.5 text-center">{lang === 'en' ? "Cals" : "ক্যালরি"}</th>
+                        <th className="p-2.5 text-center">{lang === 'en' ? "Macros (C/P/F)" : "ম্যাক্রো (শ/আ/চ)"}</th>
+                        <th className="p-2.5 text-center">{lang === 'en' ? "Potassium" : "পটাশিয়াম"}</th>
+                        <th className="p-2.5 text-center"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200/40 dark:divide-slate-800/50">
+                      {loggedItems.map(item => (
+                        <tr key={item.id} className="text-xs hover:bg-slate-500/5 transition-colors font-medium">
+                          <td className="p-2.5 pl-3 font-bold text-slate-700 dark:text-slate-200">
+                            {lang === 'en' ? item.name.en : item.name.bn}
+                          </td>
+                          <td className="p-2.5 text-center font-bold text-slate-550 dark:text-slate-400">
+                            {item.grams}g
+                          </td>
+                          <td className="p-2.5 text-center font-mono font-black text-slate-800 dark:text-purple-300">
+                            {item.calories} kcal
+                          </td>
+                          <td className="p-2.5 text-center font-mono text-[10px] text-slate-500 pl-1">
+                            <span className="text-purple-600 dark:text-purple-400 font-bold">{item.carb}g</span> / <span className="text-cyan-600 dark:text-cyan-400 font-bold">{item.protein}g</span> / <span className="text-amber-600 dark:text-amber-500 font-bold">{item.fat}g</span>
+                          </td>
+                          <td className="p-2.5 text-center font-mono text-[10px] font-bold text-amber-500">
+                            {item.potassium}mg
+                          </td>
+                          <td className="p-2.5 pr-3 text-center">
+                            <button
+                              onClick={() => handleRemoveLogItem(item.id)}
+                              className="p-1 hover:text-rose-500 text-slate-400 rounded-lg hover:bg-rose-500/10 transition-all"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Clinical Warnings and Safety Log Assessments */}
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                {lang === 'en' ? "AI Clinical Log Validation" : "রোগ-ভিত্তিক ক্লিনিকাল সতর্কবার্তা প্রতিবেদন"}
+              </h4>
+              <div className="space-y-2">
+                {getLogClinicalSafetyReport().map((alert, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3.5 rounded-xl border flex items-start gap-2.5 text-xs font-medium leading-relaxed ${
+                      alert.type === 'danger'
+                        ? 'bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-300'
+                        : alert.type === 'warning'
+                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-400'
+                        : alert.type === 'success'
+                        ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-800 dark:text-emerald-400'
+                        : 'bg-blue-500/10 border-blue-500/25 text-blue-800 dark:text-blue-400'
+                    }`}
+                  >
+                    <AlertTriangle className={`w-4 h-4 shrink-0 ${
+                      alert.type === 'danger' ? 'text-rose-500 animate-pulse' : 'text-amber-500'
+                    }`} />
+                    <span>{lang === 'en' ? alert.text.en : alert.text.bn}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Column: Visual Dashboard, Calorie Budget, Macro target comparisons (5 cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* 1. Calorie Budget Gauge card */}
+            <div className="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/10 relative overflow-hidden">
+              <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                {lang === 'en' ? "Calorie Budget Utilization" : "দৈনিক ক্যালরি বাজেট সদ্ব্যবহার মাত্রা"}
+              </p>
+
+              <div className="flex justify-between items-baseline mt-4 mb-2">
+                <span className="text-2xl font-black text-slate-800 dark:text-white">
+                  {logTotals.calories} <span className="text-xs font-bold text-slate-400">{lang === 'en' ? "logged kcal" : "ক্যালরি গৃহীত"}</span>
+                </span>
+                <span className="text-xs font-bold text-slate-401 dark:text-slate-400">
+                  {lang === 'en' ? "Limit:" : "সীমাবদ্ধতা:"} {activeTarget.calories} kcal
+                </span>
+              </div>
+
+              {/* Progress bar line */}
+              <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ${
+                    logTotals.calories > activeTarget.calories ? 'bg-rose-500' : 'bg-purple-600 dark:bg-purple-450'
+                  }`}
+                  style={{ width: `${Math.min((logTotals.calories / activeTarget.calories) * 100, 100)}%` }}
+                />
+              </div>
+
+              <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-2 font-bold">
+                <span>{Math.min(Math.round((logTotals.calories / activeTarget.calories) * 100), 100)}% {lang === 'en' ? "Fulfilled" : "পরিপূর্ণ"}</span>
+                {logTotals.calories > activeTarget.calories ? (
+                  <span className="text-rose-500 font-black">{lang === 'en' ? "LIMIT EXCEEDED!" : "বাজেট অতিক্রম!"}</span>
+                ) : (
+                  <span>{activeTarget.calories - logTotals.calories} kcal {lang === 'en' ? "left" : "অবशिष्ट"}</span>
+                )}
+              </div>
+            </div>
+
+            {/* 2. Cumulative Macro/Micro Target Comparison Charts */}
+            <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800/80 space-y-2">
+              <p className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                {lang === 'en' ? "Macro Intakes vs Profile Targets" : "ম্যাক্রোনিউট্রিয়েন্ট তুলনা রিপোর্ট"}
+              </p>
+
+              {loggedItems.length === 0 ? (
+                <div className="h-44 flex items-center justify-center">
+                  <p className="text-[11px] text-slate-400 italic">
+                    {lang === 'en' ? "Add items above to generate comparison chart..." : "তুলনা ম্যাপ দেখতে উপরে খাদ্য উপাদান যুক্ত করুন..."}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="h-44 text-xs font-sans">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={comparisonChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="name" tick={{ fontSize: 9 }} stroke="rgba(156, 163, 175, 0.5)" />
+                        <YAxis tick={{ fontSize: 9 }} stroke="rgba(156, 163, 175, 0.5)" />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 9 }} />
+                        <Bar dataKey="Logged" fill="#a855f7" name={lang === 'en' ? "Your Logged" : "আপনার খাদ্যলগ"} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="Target" fill="rgba(156, 163, 175, 0.2)" name={lang === 'en' ? "Profile Target" : "লক্ষমাত্রা সীমা"} radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-250 dark:border-slate-800 grid grid-cols-2 gap-3 text-[10px] text-slate-400 font-mono font-bold">
+                    <div className="p-2 bg-slate-200/20 dark:bg-slate-800/30 rounded-lg">
+                      <span className="block text-[8px] uppercase tracking-wider text-slate-450">{lang === 'en' ? "Iron (Total)" : "আয়রন (মোট)"}</span>
+                      <span className="text-xs text-rose-500 font-black">{logTotals.iron}mg <span className="text-[9px] text-slate-450">/ {activeTarget.iron}mg</span></span>
+                    </div>
+                    <div className="p-2 bg-slate-200/20 dark:bg-slate-800/30 rounded-lg">
+                      <span className="block text-[8px] uppercase tracking-wider text-slate-450">{lang === 'en' ? "Calcium (Total)" : "ক্যালসিয়াম (মোট)"}</span>
+                      <span className="text-xs text-blue-500 font-black">{logTotals.calcium}mg <span className="text-[9px] text-slate-450">/ {activeTarget.calcium}mg</span></span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
           </div>
         </div>
       </div>

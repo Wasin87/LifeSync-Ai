@@ -95,7 +95,7 @@ export default function App() {
   ];
 
   return (
-    <div className={`min-h-screen w-full flex-1 transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
+    <div className={`min-h-screen w-full flex-1 transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex flex-col relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
       
       {/* Decorative ambient glowing beams inspired by the Proxima and Cawar mockups */}
       <div className="absolute top-0 left-0 right-0 h-[800px] pointer-events-none overflow-hidden select-none z-0">
@@ -104,8 +104,9 @@ export default function App() {
         <div className="absolute bottom-[20px] right-[10%] w-[250px] h-[250px] bg-indigo-500/5 dark:bg-purple-800/8 rounded-full blur-[120px] pointer-events-none"></div>
       </div>
 
-      {/* 2. Left side persistent Sidebar */}
-      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass-card-light dark:glass-card-dark border-r border-slate-200/60 dark:border-purple-950/40 h-screen sticky top-0 overflow-y-auto p-5 z-20">
+      <div className="flex-1 flex flex-row relative w-full">
+        {/* 2. Left side persistent Sidebar */}
+        <aside className="hidden lg:flex flex-col w-72 shrink-0 glass-card-light dark:glass-card-dark border-r border-slate-200/60 dark:border-purple-950/40 h-screen sticky top-0 overflow-y-auto p-5 z-20">
         
         {/* Logo and Brand Identity */}
         <div className="select-none pb-4 border-b border-slate-100 dark:border-purple-950/40">
@@ -501,6 +502,7 @@ export default function App() {
 
       </main>
 
+      </div>
     </div>
   );
 }

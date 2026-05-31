@@ -117,9 +117,10 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
               {lang === 'en' ? "Live Data Pipeline Stream" : "লাইভ ডাটা পাইপলাইন ট্রান্সমিশন"}
            </h3>
            
-           <div className="flex-1 flex items-center justify-center py-10 relative">
-              {/* Background connection track */}
-              <div className="absolute left-6 right-6 h-0.5 sm:h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full top-1/2 transform -translate-y-1/2"></div>
+           <div className="flex-1 w-full overflow-x-auto py-10 relative scrollbar-none">
+              <div className="min-w-[460px] lg:min-w-0 w-full relative h-[140px] flex flex-col items-center justify-center">
+                 {/* Background connection track */}
+                 <div className="absolute left-6 right-6 h-0.5 sm:h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full top-[50%] transform -translate-y-1/2"></div>
               
               {/* Animated data packets */}
               {isTransmitting && (
@@ -157,6 +158,7 @@ export default function InteroperabilityView({ lang }: InteroperabilityViewProps
                  </div>
               </div>
            </div>
+        </div>
 
            <div className="p-3 bg-purple-500/5 rounded-xl border border-purple-500/10 text-xs font-mono text-purple-600 dark:text-purple-400 flex items-center justify-between z-10">
               <span className="flex items-center gap-2"><Key className="w-4 h-4"/> Token: 0x8F9B2...A94</span>

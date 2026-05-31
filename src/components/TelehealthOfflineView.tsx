@@ -183,8 +183,8 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
             </span>
           </div>
 
-          <div className="flex flex-col items-center justify-center py-6 overflow-hidden">
-             <div className="flex flex-row flex-nowrap w-full items-center justify-between relative px-0.5 sm:px-4 gap-0.5 sm:gap-2">
+          <div className="w-full overflow-x-auto py-6 scrollbar-none">
+             <div className="flex flex-row flex-nowrap min-w-[540px] lg:min-w-0 items-center justify-between relative px-2 sm:px-4 gap-1 sm:gap-2">
                 
                 {/* Horizontal progress background connector line */}
                 <div className="absolute left-[10%] right-[10%] h-0.5 bg-slate-200 dark:bg-slate-800 -z-10 top-[14px] sm:top-8 transform -translate-y-1/2" />
