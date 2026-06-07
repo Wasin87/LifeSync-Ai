@@ -18,7 +18,7 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
   const [ussdInput, setUssdInput] = useState("");
   const [ussdScreen, setUssdScreen] = useState(
     lang === 'en'
-      ? "LifeSync Ai Rural Portal\nDial *16263*5#\n1. Check Symptoms\n2. Log Pregnancy Vital\n3. SOS Medical Dispatch"
+      ? "LifeSync AI Rural Portal\nDial *16263*5#\n1. Check Symptoms\n2. Log Pregnancy Vital\n3. SOS Medical Dispatch"
       : "লাইফসিঙ্ক গ্রামীণ পোর্টাল\nডায়াল কোড: *১৬২৬৩*৫#\n১. লক্ষণ পরীক্ষা করুন\n২. গর্ভাবস্থার রিপোর্ট এন্ট্রি\n৩. জরুরি এসওএস সতর্কতা"
   );
   
@@ -111,7 +111,7 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
       if (val === '#') {
          setUssdScreen(
            lang === 'en'
-             ? "LifeSync Ai Rural Portal\nDial *16263*5#\n1. Check Symptoms\n2. Log Pregnancy Vital\n3. SOS Medical Dispatch"
+             ? "LifeSync AI Rural Portal\nDial *16263*5#\n1. Check Symptoms\n2. Log Pregnancy Vital\n3. SOS Medical Dispatch"
              : "লাইফসিঙ্ক গ্রামীণ পোর্টাল\nডায়াল কোড: *১৬২৬৩*৫#\n১. লক্ষণ পরীক্ষা করুন\n২. গর্ভাবস্থার রিপোর্ট এন্ট্রি\n৩. জরুরি এসওএস সতর্কতা"
          );
          setUssdStep(0);

@@ -1,0 +1,10 @@
+# LifeSync AI Robots Rules - Production Grade Search Crawlers Indexing
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /settings/
+Disallow: /tmp/
+
+# Map to fully qualified production sitemap
+Sitemap: https://lifesync-ai.vercel.app/sitemap.xml

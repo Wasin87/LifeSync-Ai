@@ -2,12 +2,124 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LifeSync Ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0" />
+    
+    <!-- 1. Primary SEO Meta Tags (Enterprise-Grade) -->
+    <title>LifeSync AI | AI Healthcare Operating System</title>
+    <meta name="title" content="LifeSync AI | AI Healthcare Operating System" />
+    <meta name="description" content="LifeSync AI is a production-grade Clinical & Telemedicine Operating System. Powering Maternal Care, Telehealth, Nutrition Intelligence, Risk Prediction, and Ethical Healthcare." />
+    <meta name="keywords" content="LifeSync AI, AI healthcare, maternal health Bangladeshi, diagnostic co-pilot, telemedicine app, offline medical diagnosis, FHIR, HL7, WHO guidelines, gestational health, gestational care AI" />
+    <meta name="author" content="LifeSync AI Group" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://lifesync-ai.vercel.app/" />
+
+    <!-- 2. Progressive Web Application (PWA) Core Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#8B5CF6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
+    <meta name="application-name" content="LifeSync AI" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Apple Mobile/Web App Configurations -->
+    <meta name="apple-mobile-web-app-title" content="LifeSync AI" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- PWA Icons Setup (Multi-resolution support) -->
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-512.png" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" />
+    <link rel="mask-icon" href="/logo.svg" color="#8B5CF6" />
+
+    <!-- Apple Splash Screen Link Configurations -->
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+    <link rel="apple-touch-startup-image" href="/logo-512.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" />
+
+    <!-- 3. Open Graph (Facebook / LinkedIn) SEO Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lifesync-ai.vercel.app/" />
+    <meta property="og:title" content="LifeSync AI | AI Healthcare Operating System" />
+    <meta property="og:description" content="AI-Powered Healthcare Operating System for Maternal Care, Telehealth, Nutrition Intelligence, Risk Prediction and Ethical Healthcare." />
+    <meta property="og:image" content="/logo-512.png" />
+
+    <!-- 4. Twitter SEO Meta Tags -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://lifesync-ai.vercel.app/" />
+    <meta property="twitter:title" content="LifeSync AI | AI Healthcare Operating System" />
+    <meta property="twitter:description" content="AI-Powered Healthcare Operating System for Maternal Care, Telehealth, Nutrition Intelligence, Risk Prediction and Ethical Healthcare." />
+    <meta property="twitter:image" content="/logo-512.png" />
+
+    <!-- 5. Industry-Standard JSON-LD Structured Schema Markup -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "MedicalWebApplication",
+        "name": "LifeSync AI",
+        "alternateName": "LifeSync AI Clinician OS",
+        "url": "https://lifesync-ai.vercel.app/",
+        "logo": "https://lifesync-ai.vercel.app/logo-512.png",
+        "headline": "AI-Powered Healthcare Operating System for Maternal Care & Telemedicine",
+        "description": "Enterprise clinical co-pilot featuring offline resilience, gestational risk forecasting, WHO guidelines compliance, custom nutrition AI engine and robust FHIR standards.",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "All (Web, Android, iOS, Windows)",
+        "browserRequirements": "Requires HTML5 compatible browser"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "LifeSync AI Technologies",
+        "url": "https://lifesync-ai.vercel.app/",
+        "logo": "https://lifesync-ai.vercel.app/logo-512.png"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "LifeSync AI",
+        "downloadUrl": "https://lifesync-ai.vercel.app/",
+        "operatingSystem": "All",
+        "applicationCategory": "MedicalApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does LifeSync AI handle offline connectivity?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "LifeSync AI features a local PWA database-synchronized system caching state locally when internet bandwidth is restricted, seamlessly syncing over active 2G network frames when reception returns."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is LifeSync AI compliant with global healthcare benchmarks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, our system implements safe, explainable healthcare AI pipelines conformant with regional clinical policies, FHIR API schema payloads, and maternal care WHO protocols."
+            }
+          }
+        ]
+      }
+    ]
+    </script>
   </head>
   <body class="w-full min-h-screen overflow-x-hidden bg-black text-white">
     <div id="root" class="min-h-screen w-full flex flex-col items-stretch"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

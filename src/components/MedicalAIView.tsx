@@ -23,7 +23,7 @@ export default function MedicalAIView({ lang }: MedicalAIViewProps) {
       id: 'welcome-msg',
       sender: 'ai',
       text: lang === 'en' 
-        ? "Hello, I am LifeSync Ai’s Medical AI Assistant. Specify your clinical indicators, upload scan files, or select one of our preloaded clinical samples below to initiate immediate diagnostic analysis."
+        ? "Hello, I am LifeSync AI’s Medical AI Assistant. Specify your clinical indicators, upload scan files, or select one of our preloaded clinical samples below to initiate immediate diagnostic analysis."
         : "নমস্কার, আমি লাইফসিঙ্ক মেডিকেল এআই। আপনার লক্ষণসমূহ লিখুন, রোগ নির্ণয়ের রিপোর্ট আপলোড করুন অথবা নিচে দেওয়া ক্লিনিকাল ফাইলটি নির্বাচন করে এআই বিশ্লেষণ পরীক্ষা করুন।",
       timestamp: new Date().toLocaleTimeString(),
     }

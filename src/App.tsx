@@ -76,6 +76,85 @@ export default function App() {
     }
   }, [theme]);
 
+  // Online / Offline state listener
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    setIsOnline(navigator.onLine);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Dynamic SEO page metadata controller
+  useEffect(() => {
+    const tabSeoMap: Record<Tab, { title: string; desc: string }> = {
+      HOME: {
+        title: "LifeSync AI | AI Healthcare Operating System",
+        desc: "Smart clinical operating system empowering health workers with maternal risk forecasting, offline-first peer-to-peer telehealth sync, and ethical AI."
+      },
+      MEDICAL_AI: {
+        title: "Medical AI Assistant | LifeSync AI Clinician OS",
+        desc: "Intelligent clinical co-pilot diagnostic companion. Access safe, explainable medical decision-support and RAG-driven WHO protocols."
+      },
+      MATERNAL: {
+        title: "Maternal Health Companion | LifeSync AI Clinician OS",
+        desc: "Continuous fetal monitoring, gestational tracking, and neonatal safety metrics compliant with strict health-grade guidelines."
+      },
+      HEALTH_WORKER: {
+        title: "Health Worker Hub | LifeSync AI Clinician OS",
+        desc: "Integrated patient register charts designed for rural community clinics, healthcare volunteers, and district WHO networks."
+      },
+      OFFLINE_SYNC: {
+        title: "Telehealth Offline System | LifeSync AI Clinician OS",
+        desc: "Resilient decentralized offline synchronization engine transmitting telemetry logs and patient summaries securely over 2G protocols."
+      },
+      NUTRITION: {
+        title: "Nutrition AI Engine | LifeSync AI Clinician OS",
+        desc: "AI Nutrition Planner compiling customized safe gestative diet modules and macro plans localized for rural communities."
+      },
+      RISK_PREDICT: {
+        title: "Risk Prediction Engine | LifeSync AI Clinician OS",
+        desc: "Advanced mathematical epidemiology and patient risk heatmaps predicting infectious outbreaks and maternal distress triggers."
+      },
+      INTEROPERABILITY: {
+        title: "API Interoperability & FHIR | LifeSync AI Clinician OS",
+        desc: "Fully compliant HL7 FHIR secure JSON transaction exchanges and state-level clinical registry interfaces."
+      },
+      ETHICAL_AI: {
+        title: "Ethical AI Center | LifeSync AI Clinician OS",
+        desc: "Auditable and explainable clinical AI pipelines prioritizing clinical safety, privacy compliance, and human oversight."
+      },
+      EMERGENCY: {
+        title: "Emergency SOS AI Dispatch | LifeSync AI Clinician OS",
+        desc: "Direct, high-priority cellular tele-triage dispatch and ambulance networks for severe maternal health emergencies."
+      },
+      ADMIN_ANALYTICS: {
+        title: "Executive NGO Analytics | LifeSync AI Clinician OS",
+        desc: "Detailed NGO, investor-ready executive KPIs charting active telehealth sessions, density heatmaps, and system throughputs."
+      },
+      SETTINGS: {
+        title: "Security & Sync Settings | LifeSync AI Clinician OS",
+        desc: "Configure encryption protocols, synchronize local databases, and alter interface language parameters."
+      }
+    };
+
+    const currentSeo = tabSeoMap[activeTab] || tabSeoMap.HOME;
+    document.title = currentSeo.title;
+    
+    // Update Meta Description dynamically
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('name', 'description');
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute('content', currentSeo.desc);
+  }, [activeTab]);
+
   const t = getTranslation(lang);
 
   // Sidebar link details
@@ -96,6 +175,14 @@ export default function App() {
 
   return (
     <div className={`min-h-screen w-full flex-1 transition-colors duration-300 bg-gradient-to-tr from-[#FAF8FF] via-white to-[#F2EBFF] dark:from-black dark:via-black dark:to-black font-sans text-slate-800 dark:text-slate-100 flex flex-col relative cosmic-grid ${theme === 'dark' ? 'dark' : 'light'}`}>
+      
+      {/* Offline Mode Active Banner */}
+      {!isOnline && (
+        <div className="bg-amber-600 text-white text-[11px] sm:text-xs text-center py-2 font-bold tracking-wider font-mono flex items-center justify-center gap-2 select-none relative z-50 backdrop-blur-md border-b border-amber-500/20 shadow-md">
+          <span className="h-2 w-2 rounded-full bg-white animate-ping"></span>
+          OFFLINE MODE ACTIVE • Local RAG Database Loaded (Secure P2P Sync Live)
+        </div>
+      )}
       
       {/* Decorative ambient glowing beams inspired by the Proxima and Cawar mockups */}
       <div className="absolute top-0 left-0 right-0 h-[800px] pointer-events-none overflow-hidden select-none z-0">
@@ -192,14 +279,7 @@ export default function App() {
             {/* Connectivity online/offline toggle indicator */}
             <button
               id="global-connectivity-indicator"
-              onClick={() => {
-                setIsOnline(!isOnline);
-                alert(
-                  isOnline 
-                    ? "Offline mode engaged! Local records are cached on SIM database." 
-                    : "Back online. Continuous HTTPS API synchronization active."
-                );
-              }}
+              onClick={() => setIsOnline(!isOnline)}
               className={`p-1.5 px-3 rounded-xl border text-[10px] font-bold tracking-wider font-mono flex items-center gap-1.5 select-none transition-all ${
                 isOnline 
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
