@@ -4,7 +4,12 @@ const ASSETS_TO_CACHE = [
   '/index.html',
   '/manifest.json',
   '/logo.svg',
+  '/logo-192.png',
   '/logo-512.png',
+  '/favicon-16.png',
+  '/favicon-32.png',
+  '/favicon-48.png',
+  '/apple-touch-icon.png',
   '/favicon.ico',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap'
 ];

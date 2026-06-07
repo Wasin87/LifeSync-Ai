@@ -24,7 +24,7 @@
 
   <!-- Outer framing protective squircle arc anchors -->
   <path d="M 160 120 A 180 180 0 0 0 160 392" stroke="#C4C9FF" stroke-width="28" stroke-linecap="round" fill="none" />
-  <path d="M 352 120 A 180 180 0 0 0 352 392" stroke="#C4C9FF" stroke-width="28" stroke-linecap="round" fill="none" />
+  <path d="M 352 120 A 180 180 0 0 1 352 392" stroke="#C4C9FF" stroke-width="28" stroke-linecap="round" fill="none" />
 
   <!-- Continuous High-Contrast Heart Rate ECG Waveform -->
   <path d="M 110 256 L 190 256 L 225 150 L 287 362 L 322 256 L 402 256" 

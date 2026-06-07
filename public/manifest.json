@@ -18,63 +18,15 @@
   ],
   "icons": [
     {
-      "src": "/logo.svg",
-      "sizes": "72x72",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "96x96",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "128x128",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "144x144",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "152x152",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
+      "src": "/logo-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo.svg",
-      "sizes": "384x384",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
+      "src": "/logo-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     },
     {
@@ -96,21 +48,21 @@
       "short_name": "Medical AI",
       "description": "Open medical diagnostics companion",
       "url": "/?tab=MEDICAL_AI",
-      "icons": [{ "src": "/logo.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Maternal Companion",
       "short_name": "Maternal",
       "description": "Fetal growth and maternal care metrics",
       "url": "/?tab=MATERNAL",
-      "icons": [{ "src": "/logo.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Risk Predictor",
       "short_name": "Predictor",
       "description": "Predictive risk and outbreak metrics",
       "url": "/?tab=RISK_PREDICT",
-      "icons": [{ "src": "/logo.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
     }
   ],
   "prefer_related_applications": false
