@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
-import { CLINICAL_CASES } from "../src/types.js";
+import { CLINICAL_CASES } from "../src/types";
 
 dotenv.config();
 
