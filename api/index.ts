@@ -146,44 +146,130 @@ app.get("/api/health", (req, res) => {
 });
 
 app.post("/api/chat", async (req, res) => {
-  const { prompt, history, language = 'en' } = req.body;
+  const { prompt, history, language = 'en', fileData } = req.body;
   
   const ai = getGemini();
   if (ai) {
     try {
-      const systemInstruction = 
-        `You are the clinical intelligence backend of LifeSync AI.
-        Provide highly structured, ethical, accessible digital health triage assessments.
-        You must return feedback in the language specified: ${language === 'bn' ? 'Bangla' : 'English'}.
-        Always align with global clinical definitions from ICD-11, WHO, and BMDC.
-        You must return a raw JSON object aligned exactly with the schema provided. 
-        Ensure no extra text, ticks back or prefixes outside of the plain JSON string.
-        The response MUST include:
-        - text: Clear, supportive, professional medical analysis in ${language === 'bn' ? 'Bangla' : 'English'}. Include a fact-check disclaimer at the end.
-        - confidence: AI confidence score (number from 0 to 100).
-        - risk: One of ['RED', 'YELLOW', 'GREEN'] based on triage rules.
-        - citations: Real or realistic citations like ICD-11, PubMed, WHO.
-        - reasoning: Concise Explainable AI (XAI) analysis outlining why this prediction was reached.
-        - treatment: Core health workers escalation protocols or evidence-based supportive home-care.`;
+      let systemInstruction = "";
+      let responseSchema: any = undefined;
+      let contents: any = prompt;
+
+      if (fileData) {
+        console.log(`[API] Processing multimodal clinical analysis for file: ${fileData.fileName || "unnamed"} (${fileData.mimeType})`);
+        systemInstruction = 
+          `You are an elite clinical intelligence analysis engine of LifeSync AI. 
+          Analyze the uploaded medical file (which may be a skin condition, rash, eye, X-ray, prescription, or lab report) with professional medical accuracy.
+          Based on the file content and user prompt, identify which category this file belongs to:
+          - "skin": for skin lesions, rashes, dermotropic conditions, eye irritations.
+          - "xray": for radiographic imaging, chest/lung scans, CT, MRI, ultrasounds.
+          - "lab": for general lab test reports, blood counts, biochemistry, prescriptions, pathology sheets.
+          
+          Generate a comprehensive, scientifically validated, professional response in JSON format.
+          You must return a raw JSON object aligned exactly with the schema provided. No markdown markers (like \`\`\`json) or text surrounding it.
+          Provide all textual fields in the requested language: ${language === 'bn' ? 'Bangla' : 'English'}.
+          Ensure numeric metrics representing real, realistic medical standards.
+          IMPORTANT: Never prescribe drug dosages. Provide only general pharmacological category info, mechanisms of action, or safety precautions, and always include a prominent clinical disclaimer advising consultation with a registered healthcare professional.`;
+
+        const imagePart = {
+          inlineData: {
+            data: fileData.base64,
+            mimeType: fileData.mimeType,
+          },
+        };
+        const textPart = {
+          text: prompt || (language === 'bn' ? "এই রোগ নির্ণয়ের রিপোর্ট বা চিত্রটি বিশ্লেষণ করুন।" : "Please analyze this diagnostic report or medical image."),
+        };
+        contents = [ imagePart, textPart ];
+
+        responseSchema = {
+          type: Type.OBJECT,
+          properties: {
+            type: { type: Type.STRING, description: "Must be one of ['skin', 'xray', 'lab']" },
+            condition: { type: Type.STRING, description: "Name of the condition or provisional diagnosis" },
+            confidence: { type: Type.NUMBER, description: "AI confidence score from 0 to 100" },
+            risk: { type: Type.STRING, description: "Triage risk level: 'RED', 'YELLOW', 'GREEN'" },
+            patientInfo: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING, description: "Patient name or 'Unknown' / 'N/A'" },
+                age: { type: Type.STRING, description: "Patient age or 'Unknown' / 'N/A'" },
+                gender: { type: Type.STRING, description: "Patient gender or 'Unknown' / 'N/A'" },
+                date: { type: Type.STRING, description: "Date of scan or date of analysis" }
+              },
+              required: ["name", "age", "gender", "date"]
+            },
+            clinicalSummary: { type: Type.STRING, description: "Professional medical summary of the scan/image" },
+            citations: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Evidence-based citations (e.g. ICD-11 codes, WHO guidelines, PubMed IDs)" },
+            reasoning: { type: Type.STRING, description: "Explainable AI (XAI) clinical reasoning process" },
+            treatment: { type: Type.STRING, description: "Supportive care recommendation steps. Must not prescribe clinical dosages of Rx drugs!" },
+            
+            biomarkers: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING, description: "Biomarker name, e.g. Hemoglobin, Fasting Glucose" },
+                  value: { type: Type.STRING, description: "Measured value with units, e.g. 10.2 g/dL" },
+                  status: { type: Type.STRING, description: "'NORMAL', 'LOW', or 'ELEVATED'" },
+                  notes: { type: Type.STRING, description: "Clinical implications of this marker's value" }
+                },
+                required: ["name", "value", "status", "notes"]
+              }
+            },
+            symptoms: { type: Type.ARRAY, items: { type: Type.STRING }, description: "List of key dermatological or physical signs detected" },
+            homeCare: { type: Type.STRING, description: "Gentle home care and comfort steps" },
+            criticalThresholds: { type: Type.STRING, description: "Severe indicators that require immediate hospital check" },
+            
+            observations: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Specific radiological visual observations" },
+            potentialConcerns: { type: Type.STRING, description: "Primary differential concerns or pathologies" },
+            followUp: { type: Type.STRING, description: "Suggested clinical next-step diagnostics, e.g. GeneXpert PCR check" }
+          },
+          required: [
+            "type", "condition", "confidence", "risk", "patientInfo",
+            "clinicalSummary", "citations", "reasoning", "treatment"
+          ]
+        };
+      } else {
+        console.log(`[API] Processing text-based medical Q&A in language: ${language}`);
+        systemInstruction = 
+          `You are the clinical intelligence backend of LifeSync AI.
+          Provide highly structured, ethical, accessible digital health triage assessments.
+          You must return feedback in the language specified: ${language === 'bn' ? 'Bangla' : 'English'}.
+          Always align with global clinical definitions from ICD-11, WHO, and BMDC.
+          You must return a raw JSON object aligned exactly with the schema provided. 
+          Ensure no extra text, ticks back or prefixes outside of the plain JSON string.
+          The response MUST include:
+          - text: Clear, supportive, professional medical analysis in ${language === 'bn' ? 'Bangla' : 'English'}. Include a fact-check disclaimer at the end.
+          - confidence: AI confidence score (number from 0 to 100).
+          - risk: One of ['RED', 'YELLOW', 'GREEN'] based on triage rules.
+          - citations: Real or realistic citations like ICD-11, PubMed, WHO.
+          - reasoning: Concise Explainable AI (XAI) analysis outlining why this prediction was reached.
+          - treatment: Core health workers escalation protocols or evidence-based supportive home-care.
+          
+          IMPORTANT: Never prescribe drug dosages. Provide only general pharmacological category info, mechanisms of action, or safety precautions, and always include a prominent clinical disclaimer advising consultation with a registered healthcare professional.`;
+
+        responseSchema = {
+          type: Type.OBJECT,
+          properties: {
+            text: { type: Type.STRING },
+            confidence: { type: Type.NUMBER },
+            risk: { type: Type.STRING },
+            citations: { type: Type.ARRAY, items: { type: Type.STRING } },
+            reasoning: { type: Type.STRING },
+            treatment: { type: Type.STRING },
+          },
+          required: ["text", "confidence", "risk", "citations", "reasoning", "treatment"]
+        };
+      }
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
+        model: "gemini-2.0-flash",
+        contents,
         config: {
           systemInstruction,
           responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              text: { type: Type.STRING },
-              confidence: { type: Type.NUMBER },
-              risk: { type: Type.STRING },
-              citations: { type: Type.ARRAY, items: { type: Type.STRING } },
-              reasoning: { type: Type.STRING },
-              treatment: { type: Type.STRING },
-            },
-            required: ["text", "confidence", "risk", "citations", "reasoning", "treatment"]
-          }
+          responseSchema
         }
       });
 
@@ -199,6 +285,12 @@ app.post("/api/chat", async (req, res) => {
     } catch (apiError) {
       console.error("Gemini API call error: ", apiError);
     }
+  }
+
+  // If we reach here, AI generation failed.
+  // If this was an image upload request, return 500 error so the frontend uses its local image mock database
+  if (fileData) {
+    return res.status(500).json({ error: "Vision server fallback required" });
   }
 
   const fallback = getFallbackCase(prompt, language);
@@ -676,7 +768,7 @@ app.post("/api/nutrition", async (req, res) => {
         Ensure numeric metrics representing real, realistic nutrition database standards per 100g or per standard serving size.`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: `Analyze the nutrition of: ${food}. Return structured JSON.`,
         config: {
           systemInstruction,
@@ -776,7 +868,7 @@ app.post("/api/scribe", async (req, res) => {
       Provide the structured summary in ${language === 'bn' ? 'Bangla' : 'English'}.`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: promptText,
       });
 

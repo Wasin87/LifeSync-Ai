@@ -25,6 +25,7 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
   const [gsmPackets, setGsmPackets] = useState<{msg: string, type: 'SMS' | 'USSD', simulationData?: any}[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
+  const [showSmsToast, setShowSmsToast] = useState(false);
 
   // Dynamic response logic for real-time simulation
   const analyzeSymptoms = (inputStr: string) => {
@@ -75,12 +76,13 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
       } else if (val === '3') {
         setUssdScreen(
           lang === 'en'
-            ? "DISPATCHING SOS!\nSending rural cell towers coordinates...\nNGO medic ambulance dispatched."
-            : "জরুরি সতর্ক সংকেত প্রেরণ সম্পূর্ণ!\nআপনার অবস্থান ট্র্যাক করা হচ্ছে। এনজিও মেডিক্যাল টিম রওনা দিয়েছে।"
+            ? "DISPATCHING SOS!\nSending rural cell towers coordinates...\nNGO medic ambulance dispatched.\nPress # to exit."
+            : "জরুরি সতর্ক সংকেত প্রেরণ সম্পূর্ণ!\nআপনার অবস্থান ট্র্যাক করা হচ্ছে। এনজিও মেডিক্যাল টিম রওনা দিয়েছে।\nবন্ধ করতে # টিপুন।"
         );
         setUssdStep(99);
         setGsmPackets(prev => [{msg: "SMS_PACKET_SEND [SOS_TRIAGE_COORD_23.6850_90.3563]", type: 'USSD'}, ...prev]);
         triggerDemo(4);
+        setShowSmsToast(true);
       }
     } else if (ussdStep === 1) {
       if (val === '1' || val === '2' || val === '3') {
@@ -92,6 +94,7 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
         setUssdStep(99);
         setGsmPackets(prev => [{msg: `GSM_COMPACT_PACKET [TRIAGE_CODE_0${val}]`, type: 'USSD'}, ...prev]);
         triggerDemo(3);
+        setShowSmsToast(true);
       }
     } else if (ussdStep === 2) {
       const wk = parseInt(val);
@@ -104,6 +107,7 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
         setUssdStep(99);
         setGsmPackets(prev => [{msg: `SMS_EMR_REPORT [WEEK_${wk}_GESTation_sync]`, type: 'USSD'}, ...prev]);
         triggerDemo(2);
+        setShowSmsToast(true);
       } else {
         setUssdScreen("Invalid. Enter 4-40:");
       }
@@ -131,6 +135,15 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
   };
 
   const handleKeypadPress = (key: string) => {
+     if (ussdStep === 99) {
+        if (key === '#' || key === 'SEND') {
+           processUssdSubmit('#');
+           setUssdInput('');
+           setShowSmsToast(false);
+        }
+        return;
+     }
+
      if (key === 'SEND') {
         processUssdSubmit(ussdInput);
         setUssdInput('');
@@ -285,6 +298,64 @@ export default function TelehealthOfflineView({ lang }: TelehealthOfflineViewPro
                 <button onClick={() => handleKeypadPress('SEND')} className="col-span-2 h-10 bg-emerald-500 hover:bg-emerald-400 rounded-xl text-white font-bold text-[12px] shadow-sm tracking-wider shadow-emerald-500/20">SEND</button>
              </div>
           </div>
+
+          <AnimatePresence>
+            {showSmsToast && (
+              <motion.div 
+                 initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: 20 }}
+                 animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                 style={{ perspective: "1000px" }}
+                 className="w-full max-w-[280px] bg-gradient-to-b from-slate-800 to-slate-900 dark:from-black dark:to-slate-900 rounded-[20px] p-[2px] shadow-2xl relative overflow-hidden mt-6 mb-2 mx-auto"
+              >
+                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/30 to-emerald-400/0 animate-[pulse_2s_ease-in-out_infinite]" />
+                 
+                 <div className="relative bg-slate-100 dark:bg-slate-950 rounded-[18px] overflow-hidden border border-slate-300 dark:border-slate-800 shadow-inner">
+                    <div className="bg-emerald-600 dark:bg-emerald-700 px-4 py-2.5 flex items-center justify-between shadow-sm">
+                       <div className="flex items-center gap-1.5 text-white">
+                          <MessageSquare className="w-3.5 h-3.5 animate-bounce" />
+                          <span className="text-[10px] font-bold tracking-widest uppercase">SMS Inbox</span>
+                       </div>
+                       <div className="flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-ping" />
+                          <span className="text-[9px] text-emerald-100 font-mono">SIM-1</span>
+                       </div>
+                    </div>
+                    
+                    <div className="p-4 bg-[#879d71] dark:bg-[#1a2e1d] shadow-[inset_0_4px_10px_rgba(0,0,0,0.1)] relative">
+                       {/* Old LCD screen texture */}
+                       <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(transparent_50%,rgba(0,0,0,1)_50%)] bg-[length:100%_4px] pointer-events-none" />
+                       
+                       <motion.div 
+                         initial={{ opacity: 0 }}
+                         animate={{ opacity: 1 }}
+                         transition={{ delay: 0.3 }}
+                         className="text-[12px] font-mono text-[#1a2f1c] dark:text-[#4ade80] leading-snug tracking-tight uppercase"
+                       >
+                          <span className="font-bold border-b border-[#1a2f1c] dark:border-[#4ade80] pb-0.5 inline-block mb-2">LifeSync AI Triage</span><br/>
+                          
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.6, duration: 1.5 }}
+                          >
+                            {lang === 'en' 
+                               ? "> ADVICE:\n> MAINTAIN HYDRATION.\n> IF FEVER PERSISTS, VISIT UPAZILA CLINIC."
+                               : "> পরামর্শ:\n> পর্যাপ্ত পানি পান করুন।\n> জ্বর বাড়লে নিকটস্থ স্বাস্থ্য কমপ্লেক্সে যান।"
+                            }
+                          </motion.p>
+                       </motion.div>
+                    </div>
+
+                    <div className="bg-slate-200 dark:bg-slate-900 px-4 py-2 flex justify-between items-center border-t border-slate-300 dark:border-slate-800">
+                       <span className="text-[8px] font-mono font-bold text-slate-500 dark:text-slate-400">1/1</span>
+                       <button onClick={() => setShowSmsToast(false)} className="px-3 py-1 bg-slate-300 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-transform text-[9px] font-black tracking-widest text-slate-700 dark:text-slate-300 rounded shadow-sm shadow-slate-400/20 dark:shadow-black/20 uppercase">OK</button>
+                    </div>
+                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="text-[10px] text-slate-400 flex flex-col items-center gap-1">
             <Smartphone className="w-4 h-4 text-cyan-500" />
